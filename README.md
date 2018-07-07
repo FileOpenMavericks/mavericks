@@ -11,6 +11,10 @@ Mavericks
 
 
 ### Set up
+1. Install nginx, node, yarn.
+2. After cloning the repo to your local machine, install webpack to your project. If you are using yarn, run this command in the project's directory:
+`yarn add webpack --dev`
+3. Run the application. (This won't work unless you set up your ngninx server below.)
 `yarn run dev`
 
 ### Nginx Site
