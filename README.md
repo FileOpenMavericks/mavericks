@@ -4,7 +4,9 @@ Mavericks
 ## Get Started
 
 ### Dependencies
+`node`
 `yarn`
+`webpack`
 
 ### Set up
 `yarn run dev`
