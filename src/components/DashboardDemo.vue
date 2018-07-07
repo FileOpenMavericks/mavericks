@@ -66,7 +66,7 @@ export default {
     methods: {
         getData() {
             let $this = this;
-            let linkId = '426732708eee4929bd0ecbe9a4fc0b181'
+            let linkId = '426732708eee4929bd0ecbe9a4fc0b18'
             $this.$http.get('https://pubtest.fileopen.com/api/analytics/link/' + linkId).then(response => {
                 $this.linkData = response.body;
                 // NOTE: Data is an array of entries, this prints the first entry
