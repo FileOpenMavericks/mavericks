@@ -321,7 +321,7 @@ li{
             <p>
 
             </p>
-            <input id="targetNode" name="targetNode" type="text" />
+            <input id="targetNode" name="targetNode" type="text" onkeyup="searchKeyUp(event)"/>
             <button class= "button" onclick="hideItem()">Search</button>
             <button class= "button" onclick="showItem()">Reset</button>
             <p>
@@ -601,6 +601,12 @@ d3.select(".tooltip").remove();
         theNode.style("opacity","0.6");
     
 }  
+
+function searchKeyUp(ev){
+    if(ev.keyCode == 13){ //If enter is pressed
+        hideItem();
+    }
+}
             
 function showItem(){
     var tooltip = d3.select("body").append("div")
