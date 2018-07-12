@@ -6,12 +6,12 @@
 <title>File Open Visualization</title>
 
    <link rel="image_src" href="rock.jpg" />
-      <script src="//d3js.org/d3.v3.min.js"></script>
+      <script src="https://d3js.org/d3.v3.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.3/moment.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
-      <script src="//d3js.org/queue.v1.min.js"></script>
-      <script src="//d3js.org/topojson.v0.min.js"></script>
-      <script src="//d3js.org/d3.geo.projection.v0.min.js"></script>
+      <script src="https://d3js.org/queue.v1.min.js"></script>
+      <script src="https://d3js.org/topojson.v0.min.js"></script>
+      <script src="https://d3js.org/d3.geo.projection.v0.min.js"></script>
       <link rel="stylesheet" href="main.css"/>   
       
     <style>
@@ -42,7 +42,60 @@ body {
 }
 
 
+input[type=text] {
+    width: 30px;
+    height: 4px;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    background-color: white;
+    background-image: url('searchicon.png');
+    background-position: 10px 10px; 
+    background-repeat: no-repeat;
+    padding: 12px 20px 12px 40px;
+    -webkit-transition: width 0.4s ease-in-out;
+    transition: width 0.4s ease-in-out;
+}
+
+input[type=text]:focus {
+    width: 50%;
+}
+        
+        
 .tooltip {
+	width: 500px;
+    height: auto;
+    font: 14px sans-serif;
+    font-weight: bold;
+    border-radius: 5px;
+    padding: 3px 3px 3px 3px;
+	position:absolute;			
+    background: SeaGreen;	
+  	border: solid black 2px;
+    border-radius: 8px;			
+    pointer-events: none;
+    margin-left: 15px;
+    color:white;
+}
+        
+.tooltips {
+	width: 500px;
+    height: auto;
+    font: 14px sans-serif;
+    font-weight: bold;
+    border-radius: 5px;
+    padding: 3px 3px 3px 3px;
+	position:absolute;			
+    background: SeaGreen;	
+  	border: solid black 2px;
+    border-radius: 8px;			
+    pointer-events: none;
+    margin-left: 15px;
+    color:white;
+}
+        
+.tooltips1 {
 	width: 500px;
     height: auto;
     font: 14px sans-serif;
@@ -254,6 +307,28 @@ li{
 
     
 }
+        
+.button {
+    color:#08233e;
+    display:inline-block;
+    font:2.4em Futura, ‘Century Gothic’, AppleGothic, sans-serif;
+    font-size:12px;
+    padding:5px;
+    background:url(overlay.png) repeat-x center #ffcc00;
+    background-color:rgba(255,204,0,1);
+    border:1px solid #ffcc00;
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    -moz-box-shadow:inset 0 1px 0 rgba(255,255,255,0.5);
+    -webkit-box-shadow:inset 0 1px 0 rgba(255,255,255,0.5);
+    border-radius:10px;
+    border-bottom:1px solid #9f9f9f;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.5);
+    cursor:pointer;
+}
+.button:hover {
+    background-color:rgba(255,204,0,0.8);
+}
 
 
       </style>
@@ -264,8 +339,18 @@ li{
         <h1>File Open Visualization</h1>
         
          <!-<div id="cool"> </div>->
+        
             <p>
+
             </p>
+            <input id="targetNode" name="targetNode" type="text" />
+            <button class = "button" onclick="hideItem()">Search</button>
+            <button class = "button" onclick="showItem()">Reset</button>
+            <p>
+
+            </p>
+        
+
             <div id="container" class="svg-container"></div>          
 
         
@@ -408,6 +493,8 @@ data.forEach(function(d) {
     
     });
     
+   
+    
      var node = g.selectAll("circle")
         .data(data)
         .enter()
@@ -465,6 +552,7 @@ data.forEach(function(d) {
                            .duration(500)
                            .style("opacity", 0);
             });
+
     
 
 force.on("tick", function() {
@@ -475,6 +563,116 @@ force.on("tick", function() {
                     }); 
 });
 }
+
+
+function hideItem(){
+
+
+d3.select(".tooltip").remove();
+    //Define Tooltip here
+
+    var tooltip = d3.select("body").append("div")
+    .attr("class", "tooltips")
+    .style("opacity", 0);
+
+
+        var itemName = document.getElementById("targetNode").value;
+        var theNode = d3.selectAll(".node")
+                        .filter(function(d) { return d.user.email == itemName })
+                        .on("mouseover", function (d) {
+                tooltip.transition()
+                        .duration(200)
+                        .style("opacity", 0.9);
+                tooltip.html( "<table>"
++"<tr><td align='left'>Session Id</td><td align='center'>:<td align='right'>" + d.id + "</td></tr>"
+ +"<tr><td align='left'>Session Viewer</td><td align='center'>:<td align='right'>" + d.viewer + "</td></tr>"
+ +"<tr><td align='left'>Session Opened</td><td align='center'>:<td align='right'>" +   d.open_date + "</td></tr>"
+ +"<tr><td align='left'>Session Length</td><td align='center'>:<td align='right'>" +   d.length + "</td></tr>"
+ +"<tr><td align='left'>Device Ip</td><td align='center'>:<td align='right'>" +   d.ip + "</td></tr>"
+  +"<tr><td align='left'>Device Created</td><td align='center'>:<td align='right'>" +  d.created_date + "</td></tr>"
+  +"<tr><td align='left'>Device Actiovated</td><td align='center'>:<td align='right'>" +  d.activated_date + "</td></tr>"
+  +"<tr><td align='left'>Device UserAgent</td><td align='center'>:<td align='right'>" +  d.user_agent + "</td></tr>"
+    
+  +"<tr><td align='left'>User</td><td align='center'>:<td align='right'>" +  d.email + "</td></tr>"
+  +"<tr><td align='left'>First Name</td><td align='center'>:<td align='right'>" +  d.first + "</td></tr>"
+  +"<tr><td align='left'>Last Name</td><td align='center'>:<td align='right'>" +  d.last + "</td></tr>" 
+  +"<tr><td align='left'>User Devices</td><td align='center'>:<td align='right'>" +  d.device + "</td></tr>"
+    
+  +"<tr><td align='left'>File Namer</td><td align='center'>:<td align='right'>" +  d.file_name + "</td></tr>"
+  +"<tr><td align='left'>File Rawsize</td><td align='center'>:<td align='right'>" +  d.raw_size + "</td></tr>"
+  +"<tr><td align='left'>File Upload Date</td><td align='center'>:<td align='right'>" +  d.upload_date + "</td></tr>"
+  +"<tr><td align='left'>File Available</td><td align='center'>:<td align='right'>" +  d.available + "</td></tr>"
+    
+  +"<tr><td align='left'>Link Name</td><td align='center'>:<td align='right'>" +  d.link_name + "</td></tr>"
+  +"<tr><td align='left'>Link Watermarked</td><td align='center'>:<td align='right'>" +  d.watermark + "</td></tr>"
+  +"<tr><td align='left'>Link Printable</td><td align='center'>:<td align='right'>" +  d.print + "</td></tr>"
+   +"<tr><td align='left'>Link Expiration</td><td align='center'>:<td align='right'>" + d.expire_date + "</td></tr>"
+   +"<tr><td align='left'>Link Created</td><td align='center'>:<td align='right'>" + d.link_c_date + "</td></tr>"
+
+                             + "</table>")
+                        .style("left", (d3.event.pageX + 5) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px");
+            })
+                .on("mouseout", function (d) {
+                tooltip.transition()
+                           .duration(500)
+                           .style("opacity", 0);
+            });
+
+        d3.selectAll(".node").style("opacity","0");
+        theNode.style("opacity","0.6");
+    
+}  
+            
+function showItem(){
+    var tooltip = d3.select("body").append("div")
+    .attr("class", "tooltips1")
+    .style("opacity", 0);
+        var itemName = document.getElementById("targetNode").value;
+        var theNode = d3.selectAll(".node").on("mouseover", function (d) {
+                tooltip.transition()
+                        .duration(200)
+                        .style("opacity", 0.9);
+                tooltip.html( "<table>"
++"<tr><td align='left'>Session Id</td><td align='center'>:<td align='right'>" + d.id + "</td></tr>"
+ +"<tr><td align='left'>Session Viewer</td><td align='center'>:<td align='right'>" + d.viewer + "</td></tr>"
+ +"<tr><td align='left'>Session Opened</td><td align='center'>:<td align='right'>" +   d.open_date + "</td></tr>"
+ +"<tr><td align='left'>Session Length</td><td align='center'>:<td align='right'>" +   d.length + "</td></tr>"
+ +"<tr><td align='left'>Device Ip</td><td align='center'>:<td align='right'>" +   d.ip + "</td></tr>"
+  +"<tr><td align='left'>Device Created</td><td align='center'>:<td align='right'>" +  d.created_date + "</td></tr>"
+  +"<tr><td align='left'>Device Actiovated</td><td align='center'>:<td align='right'>" +  d.activated_date + "</td></tr>"
+  +"<tr><td align='left'>Device UserAgent</td><td align='center'>:<td align='right'>" +  d.user_agent + "</td></tr>"
+    
+  +"<tr><td align='left'>User</td><td align='center'>:<td align='right'>" +  d.email + "</td></tr>"
+  +"<tr><td align='left'>First Name</td><td align='center'>:<td align='right'>" +  d.first + "</td></tr>"
+  +"<tr><td align='left'>Last Name</td><td align='center'>:<td align='right'>" +  d.last + "</td></tr>" 
+  +"<tr><td align='left'>User Devices</td><td align='center'>:<td align='right'>" +  d.device + "</td></tr>"
+    
+  +"<tr><td align='left'>File Namer</td><td align='center'>:<td align='right'>" +  d.file_name + "</td></tr>"
+  +"<tr><td align='left'>File Rawsize</td><td align='center'>:<td align='right'>" +  d.raw_size + "</td></tr>"
+  +"<tr><td align='left'>File Upload Date</td><td align='center'>:<td align='right'>" +  d.upload_date + "</td></tr>"
+  +"<tr><td align='left'>File Available</td><td align='center'>:<td align='right'>" +  d.available + "</td></tr>"
+    
+  +"<tr><td align='left'>Link Name</td><td align='center'>:<td align='right'>" +  d.link_name + "</td></tr>"
+  +"<tr><td align='left'>Link Watermarked</td><td align='center'>:<td align='right'>" +  d.watermark + "</td></tr>"
+  +"<tr><td align='left'>Link Printable</td><td align='center'>:<td align='right'>" +  d.print + "</td></tr>"
+   +"<tr><td align='left'>Link Expiration</td><td align='center'>:<td align='right'>" + d.expire_date + "</td></tr>"
+   +"<tr><td align='left'>Link Created</td><td align='center'>:<td align='right'>" + d.link_c_date + "</td></tr>"
+
+                             + "</table>")
+                        .style("left", (d3.event.pageX + 5) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px");
+            })
+                .on("mouseout", function (d) {
+                tooltip.transition()
+                           .duration(500)
+                           .style("opacity", 0);
+            });
+                       
+        d3.selectAll(".node").style("opacity","0.6");
+        theNode.style("opacity","0.6");
+} 
+            
 
 // zoom and pan
 var zoom = d3.behavior.zoom()
@@ -503,8 +701,8 @@ svg.call(zoom)
         <div>
             <div id="footer">
                 <div id="coll1">
-                <h3> Created by: </h3>
-                <h3>Created for: </h3>
+                <h3> Created by: Team Maverick</h3>
+                <h3>Created for: Fileopen (CMPS 115)</h3>
                 <div id="coll">
                     <table>
                               <tr>
