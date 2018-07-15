@@ -333,352 +333,7 @@ li{
 
         
             
-        <script>
-
-//Margin
-var margin = {top: 0, right: 0, bottom: 0, left: 0},
-    width = window.innerWidth - margin.left - margin.right,
-    height = window.innerHeight - margin.top - margin.bottom;
-            
-var colors = d3.scale.category10();
-            //d3.scale.category20();
-
-//Set the projection methods for the world map
-var projection = d3.geo.equirectangular()
-                   .translate([width / 2, height / 2])
-                   .scale((width) / 2.5 / Math.PI)
-                   .rotate([180]);
-
-//Set the world map path
-var path = d3.geo.path()
-    .projection(projection);
-
-//SVG container
-var svg = d3.select("div#container")
-        .append("svg")
-        .attr("width", width)
-        .attr("height", height)
-		.append("g")
-        .attr("preserveAspectRatio", "xMinYMin meet")
-        .attr("viewBox", "0 0 300 300")
-        .classed("svg-content", true)
-        .classed("svg-container", true);
-
-//Adding water
-svg.append("path")
-        .datum({type: "Sphere"})
-        .attr("class", "water")
-        .attr("d", path);
-
-var g = svg.append("g")
-.attr("width", width)
-        .attr("height", height);
-
-//Define Tooltip here
-var tooltip = d3.select("body").append("div")
-    .attr("class", "tooltip")
-    .style("opacity", 0);
-
-d3.json('tectonics.json', function (error, data) {
-	if (error)
-    throw error;
-	g.insert("path")
-		.datum(topojson.mesh(data, data.objects.tec))
-		.attr("class", "tectonic")
-		.attr("d", path);
-});
-
-//Country tooltip and list
-var countryTooltip = d3.select("body").append("div").attr("class", "countryTooltip");
-
-//Queue
-queue()
-    .defer(d3.json, "https://raw.githubusercontent.com/sharad97/CMPS-165/master/Project/world_110m.json")
-    .defer(d3.tsv, "https://raw.githubusercontent.com/sharad97/CMPS-165/master/Project/country.tsv")
-    .await(ready);
-
-//Main function
-function ready(error, world, countryData) {
-	
-    var countryById = {},
-		countries = topojson.object(world, world.objects.countries).geometries;
-   
-    //Adding countries to select
-    countryData.forEach(function (d) {
-        countryById[d.id] = d.name;
-    });
-
-    //Drawing countries on the globe
-    g.selectAll(".country").data(countries)
-        .enter()
-        .insert("path")
-        .attr("class", "country")
-        .attr("title", function (d, i) { return d.name; })
-        .attr("d", path)
-        .text(function (d) {return d.name; })
-        .on("mouseover", function (d) {
-            countryTooltip.text(countryById[d.id])
-                    .style("left", (d3.event.pageX + 7) + "px")
-                    .style("top", (d3.event.pageY - 15) + "px")
-                    .style("display", "block")
-                    .style("opacity", 1);
-        })
-        .on("mouseout", function (d) {
-            countryTooltip.style("opacity", 0)
-                    .style("display", "none");
-        });
-
-    
-d3.json("data.json", function(error, data) {
-    
-        var force = d3.layout.force()
-                        //.gravity(0.2)
-                        .charge(-0.1)
-                        .nodes(data)
-                        //.linkDistance(10)
-                        .size([0, 0])
-                        .start();
-    
-data.forEach(function(d) {
-    d.id = d.session.id;
-    d.viewer = d.session.viewer;
-    d.open_date= d.session.opened.date;
-    d.length=d.session.length;
-    
-    d.lat = parseFloat(d.location.lat);
-    d.lon= parseFloat(d.location.lon);
-
-    d.ip = d.device.ip;
-    d.created_date=d.device.created.date;
-    d.activated_date=d.device.activated.date;
-    d.user_agent=d.device.userAgent;
-    
-    d.email = d.user.email;
-    d.first = d.user.first; 
-    d.last = d.user.last; 
-    d.device = d.user.devices; 
-    
-    d.file_name = d.file.name;
-    d.raw_size =  d.file.rawSize;
-    d.upload_date = d.file.uploaded.date;
-    d.available = d.file.available;
-    
-    d.link_name = d.link.name;
-    d.watermark= d.link.watermarked;
-    d.print=d.link.printable;
-    d.expire_date = d.link.expiration.date;
-    d.link_c_date = d.link.created.date;
-    
-    });
-    
-   
-    
-     var node = g.selectAll("circle")
-        .data(data)
-        .enter()
-        .append("g")
-        .append("circle")
-        .attr("class", "node")
-			.attr("cx", function(d) {
-                return (projection([d.lon, d.lat])[0]);
-            })
-			.attr("cy", function(d) {
-                return (projection([d.lon, d.lat])[1])-10;
-            })
-			.attr("width",20)
-			.attr("height",20)
-            .attr('r', 2)
-            .style("fill", function (d) { return colors(d.email); })
-            .attr('opacity', 0.6)
-            .call(force.drag)
-            .on("mouseover", function (d) {
-                tooltip.transition()
-                        .duration(200)
-                        .style("opacity", 0.9);
-                tooltip.html( "<table>"
-+"<tr><td align='left'>Session Id</td><td align='center'>:<td align='right'>" + d.id + "</td></tr>"
- +"<tr><td align='left'>Session Viewer</td><td align='center'>:<td align='right'>" + d.viewer + "</td></tr>"
- +"<tr><td align='left'>Session Opened</td><td align='center'>:<td align='right'>" +   d.open_date + "</td></tr>"
- +"<tr><td align='left'>Session Length</td><td align='center'>:<td align='right'>" +   d.length + "</td></tr>"
- +"<tr><td align='left'>Device Ip</td><td align='center'>:<td align='right'>" +   d.ip + "</td></tr>"
-  +"<tr><td align='left'>Device Created</td><td align='center'>:<td align='right'>" +  d.created_date + "</td></tr>"
-  +"<tr><td align='left'>Device Actiovated</td><td align='center'>:<td align='right'>" +  d.activated_date + "</td></tr>"
-  +"<tr><td align='left'>Device UserAgent</td><td align='center'>:<td align='right'>" +  d.user_agent + "</td></tr>"
-    
-  +"<tr><td align='left'>User</td><td align='center'>:<td align='right'>" +  d.email + "</td></tr>"
-  +"<tr><td align='left'>First Name</td><td align='center'>:<td align='right'>" +  d.first + "</td></tr>"
-  +"<tr><td align='left'>Last Name</td><td align='center'>:<td align='right'>" +  d.last + "</td></tr>" 
-  +"<tr><td align='left'>User Devices</td><td align='center'>:<td align='right'>" +  d.device + "</td></tr>"
-    
-  +"<tr><td align='left'>File Namer</td><td align='center'>:<td align='right'>" +  d.file_name + "</td></tr>"
-  +"<tr><td align='left'>File Rawsize</td><td align='center'>:<td align='right'>" +  d.raw_size + "</td></tr>"
-  +"<tr><td align='left'>File Upload Date</td><td align='center'>:<td align='right'>" +  d.upload_date + "</td></tr>"
-  +"<tr><td align='left'>File Available</td><td align='center'>:<td align='right'>" +  d.available + "</td></tr>"
-    
-  +"<tr><td align='left'>Link Name</td><td align='center'>:<td align='right'>" +  d.link_name + "</td></tr>"
-  +"<tr><td align='left'>Link Watermarked</td><td align='center'>:<td align='right'>" +  d.watermark + "</td></tr>"
-  +"<tr><td align='left'>Link Printable</td><td align='center'>:<td align='right'>" +  d.print + "</td></tr>"
-   +"<tr><td align='left'>Link Expiration</td><td align='center'>:<td align='right'>" + d.expire_date + "</td></tr>"
-   +"<tr><td align='left'>Link Created</td><td align='center'>:<td align='right'>" + d.link_c_date + "</td></tr>"
-
-                             + "</table>")
-                        .style("left", (d3.event.pageX + 5) + "px")
-                        .style("top", (d3.event.pageY - 28) + "px");
-            })
-                .on("mouseout", function (d) {
-                tooltip.transition()
-                           .duration(500)
-                           .style("opacity", 0);
-            });
-
-    
-
-force.on("tick", function() {
-                        node.attr(
-                            "transform", 
-                            function(d) { return "translate(" + d.x + "," + d.y + ")"; }
-                        );
-                    }); 
-});
-}
-
-
-function hideItem(){
-
-
-d3.select(".tooltip").remove();
-    d3.select(".tooltips").remove();
-
-    //Define Tooltip here
-
-    var tooltip = d3.select("body").append("div")
-    .attr("class", "tooltips")
-    .style("opacity", 0);
-
-
-        var itemName = document.getElementById("targetNode").value;
-        var theNode = d3.selectAll(".node")
-                        .filter(function(d) { return d.user.email == itemName })
-                        .on("mouseover", function (d) {
-                tooltip.transition()
-                        .duration(200)
-                        .style("opacity", 0.9);
-                tooltip.html( "<table>"
-+"<tr><td align='left'>Session Id</td><td align='center'>:<td align='right'>" + d.id + "</td></tr>"
- +"<tr><td align='left'>Session Viewer</td><td align='center'>:<td align='right'>" + d.viewer + "</td></tr>"
- +"<tr><td align='left'>Session Opened</td><td align='center'>:<td align='right'>" +   d.open_date + "</td></tr>"
- +"<tr><td align='left'>Session Length</td><td align='center'>:<td align='right'>" +   d.length + "</td></tr>"
- +"<tr><td align='left'>Device Ip</td><td align='center'>:<td align='right'>" +   d.ip + "</td></tr>"
-  +"<tr><td align='left'>Device Created</td><td align='center'>:<td align='right'>" +  d.created_date + "</td></tr>"
-  +"<tr><td align='left'>Device Actiovated</td><td align='center'>:<td align='right'>" +  d.activated_date + "</td></tr>"
-  +"<tr><td align='left'>Device UserAgent</td><td align='center'>:<td align='right'>" +  d.user_agent + "</td></tr>"
-    
-  +"<tr><td align='left'>User</td><td align='center'>:<td align='right'>" +  d.email + "</td></tr>"
-  +"<tr><td align='left'>First Name</td><td align='center'>:<td align='right'>" +  d.first + "</td></tr>"
-  +"<tr><td align='left'>Last Name</td><td align='center'>:<td align='right'>" +  d.last + "</td></tr>" 
-  +"<tr><td align='left'>User Devices</td><td align='center'>:<td align='right'>" +  d.device + "</td></tr>"
-    
-  +"<tr><td align='left'>File Namer</td><td align='center'>:<td align='right'>" +  d.file_name + "</td></tr>"
-  +"<tr><td align='left'>File Rawsize</td><td align='center'>:<td align='right'>" +  d.raw_size + "</td></tr>"
-  +"<tr><td align='left'>File Upload Date</td><td align='center'>:<td align='right'>" +  d.upload_date + "</td></tr>"
-  +"<tr><td align='left'>File Available</td><td align='center'>:<td align='right'>" +  d.available + "</td></tr>"
-    
-  +"<tr><td align='left'>Link Name</td><td align='center'>:<td align='right'>" +  d.link_name + "</td></tr>"
-  +"<tr><td align='left'>Link Watermarked</td><td align='center'>:<td align='right'>" +  d.watermark + "</td></tr>"
-  +"<tr><td align='left'>Link Printable</td><td align='center'>:<td align='right'>" +  d.print + "</td></tr>"
-   +"<tr><td align='left'>Link Expiration</td><td align='center'>:<td align='right'>" + d.expire_date + "</td></tr>"
-   +"<tr><td align='left'>Link Created</td><td align='center'>:<td align='right'>" + d.link_c_date + "</td></tr>"
-
-                             + "</table>")
-                        .style("left", (d3.event.pageX + 5) + "px")
-                        .style("top", (d3.event.pageY - 28) + "px");
-            })
-                .on("mouseout", function (d) {
-                tooltip.transition()
-                           .duration(500)
-                           .style("opacity", 0);
-            });
-
-        d3.selectAll(".node").style("opacity","0");
-        theNode.style("opacity","0.6");
-    
-}  
-
-function searchKeyUp(ev){
-    if(ev.keyCode == 13){ //If enter is pressed
-        hideItem();
-    }
-}
-            
-function showItem(){
-    var tooltip = d3.select("body").append("div")
-    .attr("class", "tooltips1")
-    .style("opacity", 0);
-        var itemName = document.getElementById("targetNode").value;
-        var theNode = d3.selectAll(".node").on("mouseover", function (d) {
-                tooltip.transition()
-                        .duration(200)
-                        .style("opacity", 0.9);
-                tooltip.html( "<table>"
-+"<tr><td align='left'>Session Id</td><td align='center'>:<td align='right'>" + d.id + "</td></tr>"
- +"<tr><td align='left'>Session Viewer</td><td align='center'>:<td align='right'>" + d.viewer + "</td></tr>"
- +"<tr><td align='left'>Session Opened</td><td align='center'>:<td align='right'>" +   d.open_date + "</td></tr>"
- +"<tr><td align='left'>Session Length</td><td align='center'>:<td align='right'>" +   d.length + "</td></tr>"
- +"<tr><td align='left'>Device Ip</td><td align='center'>:<td align='right'>" +   d.ip + "</td></tr>"
-  +"<tr><td align='left'>Device Created</td><td align='center'>:<td align='right'>" +  d.created_date + "</td></tr>"
-  +"<tr><td align='left'>Device Actiovated</td><td align='center'>:<td align='right'>" +  d.activated_date + "</td></tr>"
-  +"<tr><td align='left'>Device UserAgent</td><td align='center'>:<td align='right'>" +  d.user_agent + "</td></tr>"
-    
-  +"<tr><td align='left'>User</td><td align='center'>:<td align='right'>" +  d.email + "</td></tr>"
-  +"<tr><td align='left'>First Name</td><td align='center'>:<td align='right'>" +  d.first + "</td></tr>"
-  +"<tr><td align='left'>Last Name</td><td align='center'>:<td align='right'>" +  d.last + "</td></tr>" 
-  +"<tr><td align='left'>User Devices</td><td align='center'>:<td align='right'>" +  d.device + "</td></tr>"
-    
-  +"<tr><td align='left'>File Namer</td><td align='center'>:<td align='right'>" +  d.file_name + "</td></tr>"
-  +"<tr><td align='left'>File Rawsize</td><td align='center'>:<td align='right'>" +  d.raw_size + "</td></tr>"
-  +"<tr><td align='left'>File Upload Date</td><td align='center'>:<td align='right'>" +  d.upload_date + "</td></tr>"
-  +"<tr><td align='left'>File Available</td><td align='center'>:<td align='right'>" +  d.available + "</td></tr>"
-    
-  +"<tr><td align='left'>Link Name</td><td align='center'>:<td align='right'>" +  d.link_name + "</td></tr>"
-  +"<tr><td align='left'>Link Watermarked</td><td align='center'>:<td align='right'>" +  d.watermark + "</td></tr>"
-  +"<tr><td align='left'>Link Printable</td><td align='center'>:<td align='right'>" +  d.print + "</td></tr>"
-   +"<tr><td align='left'>Link Expiration</td><td align='center'>:<td align='right'>" + d.expire_date + "</td></tr>"
-   +"<tr><td align='left'>Link Created</td><td align='center'>:<td align='right'>" + d.link_c_date + "</td></tr>"
-
-                             + "</table>")
-                        .style("left", (d3.event.pageX + 5) + "px")
-                        .style("top", (d3.event.pageY - 28) + "px");
-            })
-                .on("mouseout", function (d) {
-                tooltip.transition()
-                           .duration(500)
-                           .style("opacity", 0);
-            });
-                       
-        d3.selectAll(".node").style("opacity","0.6");
-        theNode.style("opacity","0.6");
-} 
-            
-
-// zoom and pan
-var zoom = d3.behavior.zoom()
-  .on("zoom",function() {
-     g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-     g.selectAll(".nodee")
-      .attr("width", function(){
-        var self = d3.select(this);
-        var r = 28 / d3.event.scale;  // set radius according to scale
-        self.style("stroke-width", r < 4 ? (r < 2 ? 0.5 : 1) : 2);  // scale stroke-width
-        return r;
-    });
-});
-            
-
-svg.call(zoom)
-
-
-            
-            </script>
+        
         
         <div>
             <p>
@@ -717,6 +372,354 @@ svg.call(zoom)
             </div>
         </div>
     </body>
+    <footer>
+        <script>
+
+            //Margin
+            var margin = {top: 0, right: 0, bottom: 0, left: 0},
+                width = window.innerWidth - margin.left - margin.right,
+                height = window.innerHeight - margin.top - margin.bottom;
+                        
+            var colors = d3.scale.category10();
+                        //d3.scale.category20();
+            
+            //Set the projection methods for the world map
+            var projection = d3.geo.equirectangular()
+                               .translate([width / 2, height / 2])
+                               .scale((width) / 2.5 / Math.PI)
+                               .rotate([180]);
+            
+            //Set the world map path
+            var path = d3.geo.path()
+                .projection(projection);
+            
+            //SVG container
+            var svg = d3.select("div#container")
+                    .append("svg")
+                    .attr("width", width)
+                    .attr("height", height)
+                    .append("g")
+                    .attr("preserveAspectRatio", "xMinYMin meet")
+                    .attr("viewBox", "0 0 300 300")
+                    .classed("svg-content", true)
+                    .classed("svg-container", true);
+            
+            //Adding water
+            svg.append("path")
+                    .datum({type: "Sphere"})
+                    .attr("class", "water")
+                    .attr("d", path);
+            
+            var g = svg.append("g")
+            .attr("width", width)
+                    .attr("height", height);
+            
+            //Define Tooltip here
+            var tooltip = d3.select("body").append("div")
+                .attr("class", "tooltip")
+                .style("opacity", 0);
+            
+            d3.json('tectonics.json', function (error, data) {
+                if (error)
+                throw error;
+                g.insert("path")
+                    .datum(topojson.mesh(data, data.objects.tec))
+                    .attr("class", "tectonic")
+                    .attr("d", path);
+            });
+            
+            //Country tooltip and list
+            var countryTooltip = d3.select("body").append("div").attr("class", "countryTooltip");
+            
+            //Queue
+            queue()
+                .defer(d3.json, "https://raw.githubusercontent.com/sharad97/CMPS-165/master/Project/world_110m.json")
+                .defer(d3.tsv, "https://raw.githubusercontent.com/sharad97/CMPS-165/master/Project/country.tsv")
+                .await(ready);
+            
+            //Main function
+            function ready(error, world, countryData) {
+                
+                var countryById = {},
+                    countries = topojson.object(world, world.objects.countries).geometries;
+               
+                //Adding countries to select
+                countryData.forEach(function (d) {
+                    countryById[d.id] = d.name;
+                });
+            
+                //Drawing countries on the globe
+                g.selectAll(".country").data(countries)
+                    .enter()
+                    .insert("path")
+                    .attr("class", "country")
+                    .attr("title", function (d, i) { return d.name; })
+                    .attr("d", path)
+                    .text(function (d) {return d.name; })
+                    .on("mouseover", function (d) {
+                        countryTooltip.text(countryById[d.id])
+                                .style("left", (d3.event.pageX + 7) + "px")
+                                .style("top", (d3.event.pageY - 15) + "px")
+                                .style("display", "block")
+                                .style("opacity", 1);
+                    })
+                    .on("mouseout", function (d) {
+                        countryTooltip.style("opacity", 0)
+                                .style("display", "none");
+                    });
+            
+                
+            d3.json("data.json", function(error, data) {
+                
+                    var force = d3.layout.force()
+                                    //.gravity(0.2)
+                                    .charge(-0.1)
+                                    .nodes(data)
+                                    //.linkDistance(10)
+                                    .size([0, 0])
+                                    .start();
+                
+            data.forEach(function(d) {
+                d.id = d.session.id;
+                d.viewer = d.session.viewer;
+                d.open_date= d.session.opened.date;
+                d.length=d.session.length;
+                
+                d.lat = parseFloat(d.location.lat);
+                d.lon= parseFloat(d.location.lon);
+            
+                d.ip = d.device.ip;
+                d.created_date=d.device.created.date;
+                d.activated_date=d.device.activated.date;
+                d.user_agent=d.device.userAgent;
+                
+                d.email = d.user.email;
+                d.first = d.user.first; 
+                d.last = d.user.last; 
+                d.device = d.user.devices; 
+                
+                d.file_name = d.file.name;
+                d.raw_size =  d.file.rawSize;
+                d.upload_date = d.file.uploaded.date;
+                d.available = d.file.available;
+                
+                d.link_name = d.link.name;
+                d.watermark= d.link.watermarked;
+                d.print=d.link.printable;
+                d.expire_date = d.link.expiration.date;
+                d.link_c_date = d.link.created.date;
+                
+                });
+                
+               
+                
+                 var node = g.selectAll("circle")
+                    .data(data)
+                    .enter()
+                    .append("g")
+                    .append("circle")
+                    .attr("class", "node")
+                        .attr("cx", function(d) {
+                            return (projection([d.lon, d.lat])[0]);
+                        })
+                        .attr("cy", function(d) {
+                            return (projection([d.lon, d.lat])[1])-10;
+                        })
+                        .attr("width",20)
+                        .attr("height",20)
+                        .attr('r', 2)
+                        .style("fill", function (d) { return colors(d.email); })
+                        .attr('opacity', 0.6)
+                        .call(force.drag)
+                        .on("mouseover", function (d) {
+                            tooltip.transition()
+                                    .duration(200)
+                                    .style("opacity", 0.9);
+                            tooltip.html( "<table>"
+            +"<tr><td align='left'>Session Id</td><td align='center'>:<td align='right'>" + d.id + "</td></tr>"
+             +"<tr><td align='left'>Session Viewer</td><td align='center'>:<td align='right'>" + d.viewer + "</td></tr>"
+             +"<tr><td align='left'>Session Opened</td><td align='center'>:<td align='right'>" +   d.open_date + "</td></tr>"
+             +"<tr><td align='left'>Session Length</td><td align='center'>:<td align='right'>" +   d.length + "</td></tr>"
+             +"<tr><td align='left'>Device Ip</td><td align='center'>:<td align='right'>" +   d.ip + "</td></tr>"
+              +"<tr><td align='left'>Device Created</td><td align='center'>:<td align='right'>" +  d.created_date + "</td></tr>"
+              +"<tr><td align='left'>Device Actiovated</td><td align='center'>:<td align='right'>" +  d.activated_date + "</td></tr>"
+              +"<tr><td align='left'>Device UserAgent</td><td align='center'>:<td align='right'>" +  d.user_agent + "</td></tr>"
+                
+              +"<tr><td align='left'>User</td><td align='center'>:<td align='right'>" +  d.email + "</td></tr>"
+              +"<tr><td align='left'>First Name</td><td align='center'>:<td align='right'>" +  d.first + "</td></tr>"
+              +"<tr><td align='left'>Last Name</td><td align='center'>:<td align='right'>" +  d.last + "</td></tr>" 
+              +"<tr><td align='left'>User Devices</td><td align='center'>:<td align='right'>" +  d.device + "</td></tr>"
+                
+              +"<tr><td align='left'>File Namer</td><td align='center'>:<td align='right'>" +  d.file_name + "</td></tr>"
+              +"<tr><td align='left'>File Rawsize</td><td align='center'>:<td align='right'>" +  d.raw_size + "</td></tr>"
+              +"<tr><td align='left'>File Upload Date</td><td align='center'>:<td align='right'>" +  d.upload_date + "</td></tr>"
+              +"<tr><td align='left'>File Available</td><td align='center'>:<td align='right'>" +  d.available + "</td></tr>"
+                
+              +"<tr><td align='left'>Link Name</td><td align='center'>:<td align='right'>" +  d.link_name + "</td></tr>"
+              +"<tr><td align='left'>Link Watermarked</td><td align='center'>:<td align='right'>" +  d.watermark + "</td></tr>"
+              +"<tr><td align='left'>Link Printable</td><td align='center'>:<td align='right'>" +  d.print + "</td></tr>"
+               +"<tr><td align='left'>Link Expiration</td><td align='center'>:<td align='right'>" + d.expire_date + "</td></tr>"
+               +"<tr><td align='left'>Link Created</td><td align='center'>:<td align='right'>" + d.link_c_date + "</td></tr>"
+            
+                                         + "</table>")
+                                    .style("left", (d3.event.pageX + 5) + "px")
+                                    .style("top", (d3.event.pageY - 28) + "px");
+                        })
+                            .on("mouseout", function (d) {
+                            tooltip.transition()
+                                       .duration(500)
+                                       .style("opacity", 0);
+                        });
+            
+                
+            
+            force.on("tick", function() {
+                                    node.attr(
+                                        "transform", 
+                                        function(d) { return "translate(" + d.x + "," + d.y + ")"; }
+                                    );
+                                }); 
+            });
+            }
+            
+            
+            function hideItem(){
+            
+            
+            d3.select(".tooltip").remove();
+                d3.select(".tooltips").remove();
+            
+                //Define Tooltip here
+            
+                var tooltip = d3.select("body").append("div")
+                .attr("class", "tooltips")
+                .style("opacity", 0);
+            
+            
+                    var itemName = document.getElementById("targetNode").value;
+                    var theNode = d3.selectAll(".node")
+                                    .filter(function(d) { return d.user.email == itemName })
+                                    .on("mouseover", function (d) {
+                            tooltip.transition()
+                                    .duration(200)
+                                    .style("opacity", 0.9);
+                            tooltip.html( "<table>"
+            +"<tr><td align='left'>Session Id</td><td align='center'>:<td align='right'>" + d.id + "</td></tr>"
+             +"<tr><td align='left'>Session Viewer</td><td align='center'>:<td align='right'>" + d.viewer + "</td></tr>"
+             +"<tr><td align='left'>Session Opened</td><td align='center'>:<td align='right'>" +   d.open_date + "</td></tr>"
+             +"<tr><td align='left'>Session Length</td><td align='center'>:<td align='right'>" +   d.length + "</td></tr>"
+             +"<tr><td align='left'>Device Ip</td><td align='center'>:<td align='right'>" +   d.ip + "</td></tr>"
+              +"<tr><td align='left'>Device Created</td><td align='center'>:<td align='right'>" +  d.created_date + "</td></tr>"
+              +"<tr><td align='left'>Device Actiovated</td><td align='center'>:<td align='right'>" +  d.activated_date + "</td></tr>"
+              +"<tr><td align='left'>Device UserAgent</td><td align='center'>:<td align='right'>" +  d.user_agent + "</td></tr>"
+                
+              +"<tr><td align='left'>User</td><td align='center'>:<td align='right'>" +  d.email + "</td></tr>"
+              +"<tr><td align='left'>First Name</td><td align='center'>:<td align='right'>" +  d.first + "</td></tr>"
+              +"<tr><td align='left'>Last Name</td><td align='center'>:<td align='right'>" +  d.last + "</td></tr>" 
+              +"<tr><td align='left'>User Devices</td><td align='center'>:<td align='right'>" +  d.device + "</td></tr>"
+                
+              +"<tr><td align='left'>File Namer</td><td align='center'>:<td align='right'>" +  d.file_name + "</td></tr>"
+              +"<tr><td align='left'>File Rawsize</td><td align='center'>:<td align='right'>" +  d.raw_size + "</td></tr>"
+              +"<tr><td align='left'>File Upload Date</td><td align='center'>:<td align='right'>" +  d.upload_date + "</td></tr>"
+              +"<tr><td align='left'>File Available</td><td align='center'>:<td align='right'>" +  d.available + "</td></tr>"
+                
+              +"<tr><td align='left'>Link Name</td><td align='center'>:<td align='right'>" +  d.link_name + "</td></tr>"
+              +"<tr><td align='left'>Link Watermarked</td><td align='center'>:<td align='right'>" +  d.watermark + "</td></tr>"
+              +"<tr><td align='left'>Link Printable</td><td align='center'>:<td align='right'>" +  d.print + "</td></tr>"
+               +"<tr><td align='left'>Link Expiration</td><td align='center'>:<td align='right'>" + d.expire_date + "</td></tr>"
+               +"<tr><td align='left'>Link Created</td><td align='center'>:<td align='right'>" + d.link_c_date + "</td></tr>"
+            
+                                         + "</table>")
+                                    .style("left", (d3.event.pageX + 5) + "px")
+                                    .style("top", (d3.event.pageY - 28) + "px");
+                        })
+                            .on("mouseout", function (d) {
+                            tooltip.transition()
+                                       .duration(500)
+                                       .style("opacity", 0);
+                        });
+            
+                    d3.selectAll(".node").style("opacity","0");
+                    theNode.style("opacity","0.6");
+                
+            }  
+            
+            function searchKeyUp(ev){
+                if(ev.keyCode == 13){ //If enter is pressed
+                    hideItem();
+                }
+            }
+                        
+            function showItem(){
+                var tooltip = d3.select("body").append("div")
+                .attr("class", "tooltips1")
+                .style("opacity", 0);
+                    var itemName = document.getElementById("targetNode").value;
+                    var theNode = d3.selectAll(".node").on("mouseover", function (d) {
+                            tooltip.transition()
+                                    .duration(200)
+                                    .style("opacity", 0.9);
+                            tooltip.html( "<table>"
+            +"<tr><td align='left'>Session Id</td><td align='center'>:<td align='right'>" + d.id + "</td></tr>"
+             +"<tr><td align='left'>Session Viewer</td><td align='center'>:<td align='right'>" + d.viewer + "</td></tr>"
+             +"<tr><td align='left'>Session Opened</td><td align='center'>:<td align='right'>" +   d.open_date + "</td></tr>"
+             +"<tr><td align='left'>Session Length</td><td align='center'>:<td align='right'>" +   d.length + "</td></tr>"
+             +"<tr><td align='left'>Device Ip</td><td align='center'>:<td align='right'>" +   d.ip + "</td></tr>"
+              +"<tr><td align='left'>Device Created</td><td align='center'>:<td align='right'>" +  d.created_date + "</td></tr>"
+              +"<tr><td align='left'>Device Actiovated</td><td align='center'>:<td align='right'>" +  d.activated_date + "</td></tr>"
+              +"<tr><td align='left'>Device UserAgent</td><td align='center'>:<td align='right'>" +  d.user_agent + "</td></tr>"
+                
+              +"<tr><td align='left'>User</td><td align='center'>:<td align='right'>" +  d.email + "</td></tr>"
+              +"<tr><td align='left'>First Name</td><td align='center'>:<td align='right'>" +  d.first + "</td></tr>"
+              +"<tr><td align='left'>Last Name</td><td align='center'>:<td align='right'>" +  d.last + "</td></tr>" 
+              +"<tr><td align='left'>User Devices</td><td align='center'>:<td align='right'>" +  d.device + "</td></tr>"
+                
+              +"<tr><td align='left'>File Namer</td><td align='center'>:<td align='right'>" +  d.file_name + "</td></tr>"
+              +"<tr><td align='left'>File Rawsize</td><td align='center'>:<td align='right'>" +  d.raw_size + "</td></tr>"
+              +"<tr><td align='left'>File Upload Date</td><td align='center'>:<td align='right'>" +  d.upload_date + "</td></tr>"
+              +"<tr><td align='left'>File Available</td><td align='center'>:<td align='right'>" +  d.available + "</td></tr>"
+                
+              +"<tr><td align='left'>Link Name</td><td align='center'>:<td align='right'>" +  d.link_name + "</td></tr>"
+              +"<tr><td align='left'>Link Watermarked</td><td align='center'>:<td align='right'>" +  d.watermark + "</td></tr>"
+              +"<tr><td align='left'>Link Printable</td><td align='center'>:<td align='right'>" +  d.print + "</td></tr>"
+               +"<tr><td align='left'>Link Expiration</td><td align='center'>:<td align='right'>" + d.expire_date + "</td></tr>"
+               +"<tr><td align='left'>Link Created</td><td align='center'>:<td align='right'>" + d.link_c_date + "</td></tr>"
+            
+                                         + "</table>")
+                                    .style("left", (d3.event.pageX + 5) + "px")
+                                    .style("top", (d3.event.pageY - 28) + "px");
+                        })
+                            .on("mouseout", function (d) {
+                            tooltip.transition()
+                                       .duration(500)
+                                       .style("opacity", 0);
+                        });
+                                   
+                    d3.selectAll(".node").style("opacity","0.6");
+                    theNode.style("opacity","0.6");
+            } 
+                        
+            
+            // zoom and pan
+            var zoom = d3.behavior.zoom()
+              .on("zoom",function() {
+                 g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+                 g.selectAll(".nodee")
+                  .attr("width", function(){
+                    var self = d3.select(this);
+                    var r = 28 / d3.event.scale;  // set radius according to scale
+                    self.style("stroke-width", r < 4 ? (r < 2 ? 0.5 : 1) : 2);  // scale stroke-width
+                    return r;
+                });
+            });
+                        
+            
+            svg.call(zoom)
+            
+            
+                        
+                        </script>
+    </footer>
 </html>
                   
         
