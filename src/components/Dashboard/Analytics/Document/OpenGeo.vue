@@ -58,17 +58,18 @@ export default {
         }
     },
     mounted: function() {
-        //this.getData();
-
-        //this.calculatePath();
         var margin = this.getMargin();
         var colors = d3.scaleOrdinal(d3.schemeCategory10);
-        var projection = d3.geoEquirectangular()
-                                .translate(margin.width / 2, margin.height / 2)
-                                .scale(margin.width / 2.5 / Math.PI)
-                                .rotate(180);
+        
+        //Acquiring the projection via the margin
+        var projection = this.getProjection(margin);
         console.log("Generated projection");
         console.log(projection);
+        
+        //Setting a path with the projection
+        var path = d3.geoPath()
+                    .projection(projection);
+        console.log(path);
     },
     created: function() {},
     methods: {
@@ -77,7 +78,15 @@ export default {
             width = window.innerWidth - margin.left - margin.right,
             height  = window.innerHeight - margin.top - margin.bottom;
             return margin;
-        }
+        },
+        getProjection(margin){
+            var projection = d3.geoEquirectangular()
+                                .translate(margin.width / 2, margin.height / 2)
+                                .scale(margin.width / 2.5 / Math.PI)
+                                .rotate(180);
+            return projection;
+        },
+
     }
 }
 </script>
