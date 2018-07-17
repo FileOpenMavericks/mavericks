@@ -135,17 +135,25 @@
 
     // Gets the data from file.json file
     // d3.json("file.json", function(error, data)
-    d3.json("csvjson.json", function (error, data) {
+    d3.json("file.json", function (error, data) {
+        var labelArr = new Array();
         data.forEach(function (d) {
         //Tells the block of code that for each group within the 'data' array it should carry out a function on them.
         //The function is asigned d.
         //Ensures the numeric value from data file are set and formatted correctly.
-            d.key = d.key;
+            d.key = d.user.email;
             //Function pulls out the value of "key".
-            d.value = +d.value;
+            //d.value = +d.value;
+            if (typeof labelArr[d.user.email] !== 'undefined'){
+                labelArr[d.user.email] = 0;    
+            }
+            d.value = ++labelArr[d.user.email];
+            console.log("D vale");
+            console.log(d.value); 
             //Function pulls out the value of "value".
             //Sets the "value" to a numeric value using + operator.
         });
+        console.log(labelArr);
 
 
         //The domain is used for data of space.
@@ -189,27 +197,27 @@
 
 
         // Label the data values(d.value) 
-        svg.selectAll("text")
-            .data(data)
-            .enter()
-            .append("text")
-            .text(function (d) {
-                return d.value;
-            })
-            .attr("x", function (d) {
-                return xScale(d.key);
-            })
-            .attr("y", function (d) {
-                return yScale(d.value);
-            })
-            .attr("font-family", "sans-serif")
-            .attr("font-size", "11px")
-            .attr("fill", "White")
-            .attr("dx", "1.8em")
-            //Moves text horizontaly.
-            .attr("dy", ".85em")
-            //Moves text verticaly.
-            .style("text-anchor", "middle");
+        // svg.selectAll("text")
+        //     .data(data)
+        //     .enter()
+        //     .append("text")
+        //     .text(function (d) {
+        //         return d.value;
+        //     })
+        //     .attr("x", function (d) {
+        //         return xScale(d.key);
+        //     })
+        //     .attr("y", function (d) {
+        //         return yScale(d.value);
+        //     })
+        //     .attr("font-family", "sans-serif")
+        //     .attr("font-size", "11px")
+        //     .attr("fill", "White")
+        //     .attr("dx", "1.8em")
+        //     //Moves text horizontaly.
+        //     .attr("dy", ".85em")
+        //     //Moves text verticaly.
+        //     .style("text-anchor", "middle");
 
 
 
