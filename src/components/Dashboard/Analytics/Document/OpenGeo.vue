@@ -58,45 +58,26 @@ export default {
         }
     },
     mounted: function() {
-        this.getData();
+        //this.getData();
 
-        this.calculatePath();
+        //this.calculatePath();
+        var margin = this.getMargin();
+        var colors = d3.scaleOrdinal(d3.schemeCategory10);
+        var projection = d3.geoEquirectangular()
+                                .translate(margin.width / 2, margin.height / 2)
+                                .scale(margin.width / 2.5 / Math.PI)
+                                .rotate(180);
+        console.log("Generated projection");
+        console.log(projection);
     },
     created: function() {},
     methods: {
-        getData() {
-            let $this = this;
-            let linkId = '426732708eee4929bd0ecbe9a4fc0b18'
-            $this.$http.get('https://pubtest.fileopen.com/api/analytics/link/' + linkId).then(response => {
-                $this.linkData = response.body;
-                // NOTE: Data is an array of entries, this prints the first entry
-                console.log($this.linkData[0]);
-
-                // NOTE: This is where I would call it calculate the data and create the graphic
-                //       However, it currently uses static test data so it isn't necessary
-            }, response => {
-                console.error(response);
-            });
-        },
-        getScales() {
-            const x = d3.scaleTime().range([0, 430]);
-            const y = d3.scaleLinear().range([210, 0]);
-            d3.axisLeft().scale(x);
-            d3.axisBottom().scale(y);
-            x.domain(d3.extent(this.data, (d, i) => i));
-            y.domain([0, d3.max(this.data, d => d)]);
-            return {
-                x,
-                y
-            };
-        },
-        calculatePath() {
-            const scale = this.getScales();
-            const path = d3.line()
-                .x((d, i) => scale.x(i))
-                .y(d => scale.y(d));
-            this.line = path(this.data);
-        },
+        getMargin(){
+            var margin = {top: 0, right: 0, bottom: 0, left: 0},
+            width = window.innerWidth - margin.left - margin.right,
+            height  = window.innerHeight - margin.top - margin.bottom;
+            return margin;
+        }
     }
 }
 </script>
