@@ -6,11 +6,7 @@
                 <v-text-field prepend-icon="search" v-model="searchTerm" hide-details single-line></v-text-field>
             </v-toolbar>
             <v-card-text>
-                <svg width="100%" height="500px">
-                    <g style="transform: translate(0, 10px)">
-                        <path :d="line" />
-                    </g>
-                </svg>
+                <div id="map-container" class="svg-container"></div>
             </v-card-text>
         </v-card>
     </v-layout>
@@ -70,6 +66,9 @@ export default {
         var path = d3.geoPath()
                     .projection(projection);
         console.log(path);
+        var svg = this.makeSvg(path, margin);
+        console.log("SVG:");
+        console.log(svg);
     },
     created: function() {},
     methods: {
@@ -86,6 +85,19 @@ export default {
                                 .rotate(180);
             return projection;
         },
+        makeSvg(path, margin){
+            //May need cleaning in terms of the view box
+            var svg = d3.select("div#map-container")
+                .append("svg")
+                .attr("width", margin.width)
+                .attr("height", margin.height)
+                .append("g")
+                .attr("preserveAspectRatio", "xMinYMin meet")
+                .attr("viewBox", "0 0 300 300")
+                .classed("svg-content", true)
+                .classed("svg-container", true);
+            return svg;
+        }
 
     }
 }
