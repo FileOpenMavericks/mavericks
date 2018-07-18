@@ -55,20 +55,31 @@ export default {
     },
     mounted: function() {
         var margin = this.getMargin();
+        var height = window.innerHeight - margin.top - margin.bottom;
+        var width = window.innerWidth - margin.left - margin.right;
         var colors = d3.scaleOrdinal(d3.schemeCategory10);
         
         //Acquiring the projection via the margin
-        var projection = this.getProjection(margin);
+        var projection = this.getProjection(width, height);
         console.log("Generated projection");
         console.log(projection);
         
         //Setting a path with the projection
         var path = d3.geoPath()
                     .projection(projection);
-        console.log(path);
-        var svg = this.makeSvg(path, margin);
+        console.log("PATH:");
+        console.log(path());
+        var svg = this.makeSvg(path, width, height);
         console.log("SVG:");
         console.log(svg);
+        var g = this.makeG(svg, margin);
+        console.log("G unit:");
+        console.log(g);
+
+        //Get tool tip
+        var tooltip = this.makeToolTip();
+        
+        
     },
     created: function() {},
     methods: {
@@ -78,25 +89,43 @@ export default {
             height  = window.innerHeight - margin.top - margin.bottom;
             return margin;
         },
-        getProjection(margin){
+        getProjection(width, height){
             var projection = d3.geoEquirectangular()
-                                .translate(margin.width / 2, margin.height / 2)
-                                .scale(margin.width / 2.5 / Math.PI)
+                                .translate([width / 2, height / 2])
+                                .scale(width / 2.5 / Math.PI)
                                 .rotate(180);
+            console.log(projection);
             return projection;
         },
-        makeSvg(path, margin){
+        makeSvg(path, width, height){
             //May need cleaning in terms of the view box
             var svg = d3.select("div#map-container")
                 .append("svg")
-                .attr("width", margin.width)
-                .attr("height", margin.height)
+                .attr("width", width)
+                .attr("height", height)
                 .append("g")
                 .attr("preserveAspectRatio", "xMinYMin meet")
                 .attr("viewBox", "0 0 300 300")
                 .classed("svg-content", true)
                 .classed("svg-container", true);
+            
+            //Add water
+            svg.append("path")
+                .datum({type: "Sphere"})
+                .attr("class", "water")
+                .attr("d", path);
             return svg;
+        },
+        makeG(svg, margin){
+            var g = svg.append("g")
+                    .attr("height", margin.height);
+            return g;
+        },
+        makeToolTip(){
+            var tooltip = d3.select("body").append("div")
+                            .attr("class", "tooltip")
+                            .style("opacity", 0);
+            return tooltip;
         }
 
     }
