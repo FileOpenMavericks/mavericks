@@ -34,14 +34,184 @@ nav.toolbar.file-toolbar {
     box-shadow: none;
     height: 56px;
 }
+body { 
+                color: #666; 
+                background: white; 
+                font: normal 10px "Helvetica Neue", Helvetica, sans-serif; 
+                margin:auto;
+                position: relative;
+                text-align: center;	
+            }
 
 .toolbar__content {
     background: white;
 }
+.svg-container {
+                border:2px solid #000;
+                margin:1 auto; 
+                display: inline-block;
+                position: relative;
+                width: 100%;
+                vertical-align: top;
+                overflow: hidden;
+            }
+            .svg-content {
+                display: inline-block;
+                position: absolute;
+                top: 0;
+                left: 0;
+            }
+
+
+            .tooltip {
+                width: 500px;
+                height: auto;
+                font: 14px sans-serif;
+                font-weight: bold;
+                border-radius: 5px;
+                padding: 3px 3px 3px 3px;
+                position:absolute;			
+                background: SeaGreen;	
+                border: solid black 2px;
+                border-radius: 8px;			
+                pointer-events: none;
+                margin-left: 15px;
+                color:white;
+            }
+
+            .tooltips {
+                width: 500px;
+                height: auto;
+                font: 14px sans-serif;
+                font-weight: bold;
+                border-radius: 5px;
+                padding: 3px 3px 3px 3px;
+                position:absolute;			
+                background: SeaGreen;	
+                border: solid black 2px;
+                border-radius: 8px;			
+                pointer-events: none;
+                margin-left: 15px;
+                color:white;
+            }
+
+            .tooltips1 {
+                width: 500px;
+                height: auto;
+                font: 14px sans-serif;
+                font-weight: bold;
+                border-radius: 5px;
+                padding: 3px 3px 3px 3px;
+                position:absolute;			
+                background: SeaGreen;	
+                border: solid black 2px;
+                border-radius: 8px;			
+                pointer-events: none;
+                margin-left: 15px;
+                color:white;
+            }
+
+            country {
+              fill: #41ae76;
+              stroke: #fff;
+              stroke-width: .5px;
+              stroke-linejoin: round;
+              cursor: pointer;
+            }
+
+            country:hover{
+                fill:lightgreen;
+            }
+
+            .hidden { 
+              display: none; 
+            }
+
+
+            path {
+              fill: none;
+              stroke: #333;
+              stroke-width: .5px;
+            }
+
+            .land-boundary {
+              stroke-width: 1px;
+            }
+
+            .county-boundary {
+              stroke: #ddd;
+            }
+
+            .site {
+                fill: red;
+                stroke-width: 0.7px;
+                stroke: black;
+                opacity: 0.9;
+            }
+
+
+            .site:hover {
+              fill: black ;
+            }
+
+            .dot{
+                stroke:black;
+                stroke-width:0.7px;
+            }
+
+
+            .tectonic {
+              fill: none;
+              stroke: red;
+              opacity: 0.9;
+            }
+
+
+            .sphere {
+                fill: #bbb;
+            }
+
+
+            .overlay {
+                fill: none;
+                pointer-events: all;
+            }
+
+
+            .water {
+              fill: #ccece6;
+            }
+
+
+            .land {
+              fill: #41ae76;
+              stroke: green;
+              stroke-width: 0.7px;
+            }
+
+
+            .focused {
+              fill: lightgreen;
+            }
+
+
+            .countryTooltip {
+              position: absolute;
+              display: none;
+              pointer-events: none;
+              background: #fff;
+              padding: 5px;
+              text-align: left;
+              border: solid #ccc 1px;
+              color: #666;
+              font-size: 14px;
+              font-family: sans-serif;
+            }
 </style>
 
 <script>
 import * as d3 from 'd3';
+import * as topojson from 'topojson';
 
 export default {
     name: 'open-geo',
@@ -75,10 +245,12 @@ export default {
                 console.error(response);
             });
         },
-        renderData(data){
+        renderData(sessionData){
             var margin = this.getMargin();
             var height = window.innerHeight - margin.top - margin.bottom;
             var width = window.innerWidth - margin.left - margin.right;
+            height = 200;
+            width = 200;
             var colors = d3.scaleOrdinal(d3.schemeCategory10);
             
             //Acquiring the projection via the margin
@@ -94,7 +266,7 @@ export default {
             var svg = this.makeSvg(path, width, height);
             console.log("SVG:");
             console.log(svg);
-            var g = this.makeG(svg, margin);
+            var g = this.makeG(svg, width, height);
             console.log("G unit:");
             console.log(g);
 
@@ -110,6 +282,33 @@ export default {
             files.forEach(function(url) {
                 promises.push(d3.json(url))
             });
+
+            Promise.all(promises).then(function(worldData) {
+                console.log(topojson);
+                var world_110m = topojson.feature(worldData[0], 
+                                            worldData[0].objects.countries);
+                //Turning json information about country polygons into vector path
+                console.log("worldData");
+                console.log(worldData);
+                console.log("World 110");
+                console.log(world_110m);
+
+                console.log(world_110m.geometry);
+
+                console.log("World 110 features");
+                console.log(world_110m.features);
+
+                console.log("Path:");
+                console.log(path);
+
+                
+                g.append("g")
+                .attr("class", "country")
+                .selectAll("country")
+                .data(world_110m.features)
+                .enter().append("path")
+                .attr("d", path);
+            });
         },
         getMargin(){
             var margin = {top: 0, right: 0, bottom: 0, left: 0};
@@ -121,7 +320,7 @@ export default {
             var projection = d3.geoEquirectangular()
                                 .translate([width / 2, height / 2])
                                 .scale(width / 2.5 / Math.PI)
-                                .rotate(180);
+                                .rotate([0]);
             console.log(projection);
             return projection;
         },
@@ -138,15 +337,16 @@ export default {
                 .classed("svg-container", true);
             
             //Add water
-            svg.append("path")
-                .datum({type: "Sphere"})
-                .attr("class", "water")
-                .attr("d", path);
+            // svg.append("path")
+            //     .datum({type: "Sphere"})
+            //     .attr("class", "water")
+            //     .attr("d", path);
             return svg;
         },
-        makeG(svg, margin){
+        makeG(svg, width, height){
             var g = svg.append("g")
-                    .attr("height", margin.height);
+                    .attr("width", width)
+                    .attr("height", height);
             return g;
         },
         makeToolTip(){
