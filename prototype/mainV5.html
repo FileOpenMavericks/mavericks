@@ -358,12 +358,12 @@
                 .attr("class", "tooltip")
                 .style("opacity", 0);
 
-            d3.json('tectonics.json').then(function (data) {
-                g.insert("path")
-                    .datum(topojson.mesh(data, data.objects.tec))
-                    .attr("class", "tectonic")
-                    .attr("d", path);
-            });
+            // d3.json('tectonics.json').then(function (data) {
+            //     g.insert("path")
+            //         .datum(topojson.mesh(data, data.objects.tec))
+            //         .attr("class", "tectonic")
+            //         .attr("d", path);
+            // });
 
             //Country tooltip and list
             var countryTooltip = d3.select("body").append("div").attr("class", "countryTooltip");
@@ -381,23 +381,30 @@
             Promise.all(promises).then(function(data) {
                 
                 var world_110m = topojson.feature(data[0], data[0].objects.countries);
+                console.log("World 110");
+                console.log(world_110m);
 
+                console.log("Path");
+                console.log(path);
+                //Turning json information about country polygons into vector path
                 g.append("g")
                 .attr("class", "country")
                 .selectAll("country")
                 .data(world_110m.features)
                 .enter().append("path")
                 .attr("d", path);
-
+                
+                //Call back when getting data from FileOpen json 
                 d3.json("data.json").then(function (data) {
-
+                    
+                    //Force simulation for how nodes move
                     var graphLayout = d3.forceSimulation(data)
                         .force("collide",d3.forceCollide(0.1))
                         .force("charge", d3.forceManyBody().strength(-0.1))
                         .force("x", d3.forceX().strength(0.5))
                         .force("y", d3.forceY().strength(0.5));
 
-
+                    //For each session we get the data
                     data.forEach(function(d) {
                         d.id = d.session.id;
                         d.viewer = d.session.viewer;

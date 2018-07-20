@@ -251,8 +251,8 @@ export default {
             var margin = this.getMargin();
             var height = window.innerHeight - margin.top - margin.bottom;
             var width = window.innerWidth - margin.left - margin.right;
-            height = 200;
-            width = 200;
+            height = 300;
+            width = 500;
             var colors = d3.scaleOrdinal(d3.schemeCategory10);
             
             //Acquiring the projection via the margin
