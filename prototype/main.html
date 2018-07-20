@@ -349,9 +349,12 @@ var projection = d3.geo.equirectangular()
                    .scale((width) / 2.5 / Math.PI)
                    .rotate([180]);
 
+
 //Set the world map path
 var path = d3.geo.path()
     .projection(projection);
+console.log("PATH:");
+console.log(path);
 
 //SVG container
 var svg = d3.select("div#container")
@@ -379,14 +382,14 @@ var tooltip = d3.select("body").append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
 
-d3.json('tectonics.json', function (error, data) {
-	if (error)
-    throw error;
-	g.insert("path")
-		.datum(topojson.mesh(data, data.objects.tec))
-		.attr("class", "tectonic")
-		.attr("d", path);
-});
+// d3.json('tectonics.json', function (error, data) {
+// 	if (error)
+//     throw error;
+// 	g.insert("path")
+// 		.datum(topojson.mesh(data, data.objects.tec))
+// 		.attr("class", "tectonic")
+// 		.attr("d", path);
+// });
 
 //Country tooltip and list
 var countryTooltip = d3.select("body").append("div").attr("class", "countryTooltip");

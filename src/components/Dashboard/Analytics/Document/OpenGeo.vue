@@ -287,22 +287,9 @@ export default {
 
             Promise.all(promises).then(function(worldData) {
                 console.log(topojson);
-                var world_110m = topojson.feature(worldData[0], 
+                var world_110m = topojson.feature(worldData[0],
                                             worldData[0].objects.countries);
                 //Turning json information about country polygons into vector path
-                console.log("worldData");
-                console.log(worldData);
-                console.log("World 110");
-                console.log(world_110m);
-
-                console.log(world_110m.geometry);
-
-                console.log("World 110 features");
-                console.log(world_110m.features);
-
-                console.log("Path:");
-                console.log(path);
-
                 
                 g.append("g")
                 .attr("class", "country")
