@@ -225,8 +225,10 @@ export default {
     },
     mounted: function() {
         //Doc Ref Id: 9c80af62b1094bdfab633019b2d10c1e
-        this.updateMap('9c80af62b1094bdfab633019b2d10c1e');
-        
+        //this.updateMap('9c80af62b1094bdfab633019b2d10c1e');
+        //All longs and lats 52f2468e05f743ca9911abe07c196363
+        this.updateMap("52f2468e05f743ca9911abe07c196363");
+
         
     },
     created: function() {},
@@ -308,6 +310,111 @@ export default {
                 .data(world_110m.features)
                 .enter().append("path")
                 .attr("d", path);
+
+                var data = sessionData;
+                var graphLayout = d3.forceSimulation(data)
+                        .force("collide",d3.forceCollide(0.1))
+                        .force("charge", d3.forceManyBody().strength(-0.1))
+                        .force("x", d3.forceX().strength(0.5))
+                        .force("y", d3.forceY().strength(0.5));
+
+                    //For each session we get the data
+                    data.forEach(function(d) {
+                        d.id = d.session.id;
+                        d.viewer = d.session.viewer;
+                        d.open_date= d.session.opened.date;
+                        d.length=d.session.length;
+
+                        // d.lat = (d.location.lat ?  parseFloat(d.location.lat): 0);
+                        // d.lon= (d.location.lon ? parseFloat(d.location.lon) : 0);
+                        d.lat = 0;
+                        if(d.location.lat){
+                            d.lat = parseFloat(d.location.lat);
+                            console.log(d.location);
+                        }
+                        d.lon = 0;
+                        if(d.location.lon){
+                            d.lon = parseFloat(d.location.lon);
+                            
+                        }
+                        
+                        d.ip = d.device.ip;
+                        d.created_date=d.device.created.date;
+                        d.activated_date=d.device.activated.date;
+                        d.user_agent=d.device.userAgent;
+
+                        d.email = d.user.email;
+                        d.first = d.user.first; 
+                        d.last = d.user.last; 
+                        d.device = d.user.devices; 
+
+                        d.file_name = d.file.name;
+                        d.raw_size =  d.file.rawSize;
+                        d.upload_date = d.file.uploaded.date;
+                        d.available = d.file.available;
+
+                        d.link_name = d.link.name;
+                        d.watermark= d.link.watermarked;
+                        d.print=d.link.printable;
+                        d.expire_date = d.link.expiration.date;
+                        d.link_c_date = d.link.created.date;
+                        });
+                    console.log(data);
+
+                    var node = g.selectAll("circle")
+                        .data(data)
+                        .enter()
+                        .append("g")
+                        .append("circle")
+                        .attr("class", "node")
+                        .attr("cx", function(d) {
+                            return (projection([d.lon, d.lat])[0]);
+                        })
+                        .attr("cy", function(d) {
+                                return (projection([d.lon, d.lat])[1]);
+                        })
+                        .attr("width",20)
+                        .attr("height",20)
+                        .attr('r', 2)
+                        .style("fill", function (d) { return colors(d.email); })
+                        .style('opacity', 0.6)
+                        .on("mouseover", function (d) {
+                            tooltip.transition()
+                                .duration(200)
+                                .style("opacity", 0.9);
+                            tooltip.html( "<table>"
+                                         +"<tr><td align='left'>Session Id</td><td align='center'>:<td align='right'>" + d.id + "</td></tr>"
+                                         +"<tr><td align='left'>Session Viewer</td><td align='center'>:<td align='right'>" + d.viewer + "</td></tr>"
+                                         +"<tr><td align='left'>Session Opened</td><td align='center'>:<td align='right'>" +   d.open_date + "</td></tr>"
+                                         +"<tr><td align='left'>Session Length</td><td align='center'>:<td align='right'>" +   d.length + "</td></tr>"
+                                         +"<tr><td align='left'>Device Ip</td><td align='center'>:<td align='right'>" +   d.ip + "</td></tr>"
+                                         +"<tr><td align='left'>Device Created</td><td align='center'>:<td align='right'>" +  d.created_date + "</td></tr>"
+                                         +"<tr><td align='left'>Device Actiovated</td><td align='center'>:<td align='right'>" +  d.activated_date + "</td></tr>"
+                                         +"<tr><td align='left'>Device UserAgent</td><td align='center'>:<td align='right'>" +  d.user_agent + "</td></tr>"
+                                         +"<tr><td align='left'>User</td><td align='center'>:<td align='right'>" +  d.email + "</td></tr>"
+                                         +"<tr><td align='left'>First Name</td><td align='center'>:<td align='right'>" +  d.first + "</td></tr>"
+                                         +"<tr><td align='left'>Last Name</td><td align='center'>:<td align='right'>" +  d.last + "</td></tr>" 
+                                         +"<tr><td align='left'>User Devices</td><td align='center'>:<td align='right'>" +  d.device + "</td></tr>"
+                                         +"<tr><td align='left'>File Namer</td><td align='center'>:<td align='right'>" +  d.file_name + "</td></tr>"
+                                         +"<tr><td align='left'>File Rawsize</td><td align='center'>:<td align='right'>" +  d.raw_size + "</td></tr>"
+                                         +"<tr><td align='left'>File Upload Date</td><td align='center'>:<td align='right'>" +  d.upload_date + "</td></tr>"
+                                         +"<tr><td align='left'>File Available</td><td align='center'>:<td align='right'>" +  d.available + "</td></tr>"
+                                         +"<tr><td align='left'>Link Name</td><td align='center'>:<td align='right'>" +  d.link_name + "</td></tr>"
+                                         +"<tr><td align='left'>Link Watermarked</td><td align='center'>:<td align='right'>" +  d.watermark + "</td></tr>"
+                                         +"<tr><td align='left'>Link Printable</td><td align='center'>:<td align='right'>" +  d.print + "</td></tr>"
+                                         +"<tr><td align='left'>Link Expiration</td><td align='center'>:<td align='right'>" + d.expire_date + "</td></tr>"
+                                         +"<tr><td align='left'>Link Created</td><td align='center'>:<td align='right'>" + d.link_c_date + "</td></tr>"
+                                         + "</table>")
+                                .style("left", (d3.event.pageX + 5) + "px")
+                                .style("top", (d3.event.pageY - 28) + "px");
+                        })
+                        .on("mouseout", function (d) {
+                            tooltip.transition()
+                                .duration(500)
+                                .style("opacity", 0);
+                        });
+
+                    
             });
         },
         getMargin(){
