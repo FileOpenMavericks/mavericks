@@ -18,18 +18,14 @@
 </template>
 
 <style scoped>
-.toolbar__content>button.btn.btn--icon>.btn__content>i {
-    color: rgba(0, 0, 0, 0.54);
-}
-
-.toolbar {
+.v-toolbar {
     padding-left: 10px;
     padding-right: 10px;
     background: white;
     box-shadow: none;
 }
 
-nav.toolbar.file-toolbar {
+nav.v-toolbar.file-toolbar {
     background: white;
     box-shadow: none;
 }
@@ -39,7 +35,7 @@ nav.toolbar.file-toolbar {
     height: 56px;
 }
 
-.toolbar__content {
+.v-toolbar__content {
     background: white;
 }
 </style>
