@@ -2,4 +2,4 @@ dist/*
 #exception to keep the dist folder
 !dist/.gitkeep
 node_modules/
-yarn.lock
+.DS_Store
