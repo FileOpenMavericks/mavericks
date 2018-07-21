@@ -64,6 +64,22 @@ body {
     left: 0;
 }
 
+.tooltip {
+    width: 500px;
+    height: auto;
+    font: 14px sans-serif;
+    font-weight: bold;
+    border-radius: 5px;
+    padding: 3px 3px 3px 3px;
+    position:relative;			
+    background: SeaGreen;	
+    border: solid black 2px;
+    border-radius: 8px;			
+    pointer-events: none;
+    margin-left: 15px;
+    color:white;
+}
+
 </style>
 
 <script>
@@ -106,7 +122,7 @@ export default {
         renderData(sessionData){
             var width = 860;
             var height = 500;
-            var maxRadius = 12;
+            var maxRadius = 6;
 
             var n = 200,
                 m = 10;
@@ -119,31 +135,175 @@ export default {
 
             var nodes = sessionData;
             console.log(nodes);
+            
+            nodes.forEach(function(d) {
+                        d.id = d.session.id;
+                        d.viewer = d.session.viewer;
+                        d.open_date= d.session.opened.date;
+                        d.length=d.session.length;
+
+                        // d.lat = (d.location.lat ?  parseFloat(d.location.lat): 0);
+                        // d.lon= (d.location.lon ? parseFloat(d.location.lon) : 0);
+                        d.lat = 0;
+                        if(d.location.lat){
+                            d.lat = parseFloat(d.location.lat);
+                            console.log(d.location);
+                        }
+                        d.lon = 0;
+                        if(d.location.lon){
+                            d.lon = parseFloat(d.location.lon);
+                            
+                        }
+                        
+                        d.ip = d.device.ip;
+                        d.created_date=d.device.created.date;
+                        d.activated_date=d.device.activated.date;
+                        d.user_agent=d.device.userAgent;
+
+                        d.email = d.user.email;
+                        d.first = d.user.first; 
+                        d.last = d.user.last; 
+                        d.device = d.user.devices; 
+
+                        d.file_name = d.file.name;
+                        d.raw_size =  d.file.rawSize;
+                        d.upload_date = d.file.uploaded.date;
+                        d.available = d.file.available;
+
+                        d.link_name = d.link.name;
+                        d.watermark= d.link.watermarked;
+                        d.print=d.link.printable;
+                        d.expire_date = d.link.expiration.date;
+                        d.link_c_date = d.link.created.date;
+                        });
+            
+            var forceCollide = d3.forceCollide()
+            .radius(function(d) { return d.radius + 1.5; })
+            .iterations(1);
+
+            var force = d3.forceSimulation()
+                .nodes(nodes)
+                .force("center", d3.forceCenter())
+                .force("collide", forceCollide)
+                //.force("cluster", forceCluster)
+                .force("gravity", d3.forceManyBody(30))
+                .force("x", d3.forceX().strength(.7))
+                .force("y", d3.forceY().strength(.7))
+                .on("tick", tick);
 
 
             var svg = this.makeSvg(width, height);
-            
+            var g = this.makeG(svg, width, height);
+
             console.log(svg);
+            
+            var zoom = d3.zoom()
+            .on("zoom",function() {
+                g.attr("transform", d3.event.transform);
+                g.selectAll(".node")
+            });
+            g.call(zoom);
+            
+            var tooltip = this.makeToolTip();
 
             var circle = svg.selectAll("circle")
                 .data(nodes)
                 .enter()
                 .append("circle")
-                .attr("r", function(d) { return d.session.length; })
-                .style("fill", function(d) { return color(d.user.email); });
+                .attr("r", function(d) { return d.length; })
+                .style("fill", function(d) { return color(d.email); })
+                .on("mouseover", function (d) {
+                            tooltip.transition()
+                                .duration(200)
+                                .style("opacity", 0.9);
+                            tooltip.html( "<table>"
+                                         +"<tr><td align='left'>Session Id</td><td align='center'>:<td align='right'>" + d.id + "</td></tr>"
+                                         +"<tr><td align='left'>Session Viewer</td><td align='center'>:<td align='right'>" + d.viewer + "</td></tr>"
+                                         +"<tr><td align='left'>Session Opened</td><td align='center'>:<td align='right'>" +   d.open_date + "</td></tr>"
+                                         +"<tr><td align='left'>Session Length</td><td align='center'>:<td align='right'>" +   d.length + "</td></tr>"
+                                         +"<tr><td align='left'>Device Ip</td><td align='center'>:<td align='right'>" +   d.ip + "</td></tr>"
+                                         +"<tr><td align='left'>Device Created</td><td align='center'>:<td align='right'>" +  d.created_date + "</td></tr>"
+                                         +"<tr><td align='left'>Device Actiovated</td><td align='center'>:<td align='right'>" +  d.activated_date + "</td></tr>"
+                                         +"<tr><td align='left'>Device UserAgent</td><td align='center'>:<td align='right'>" +  d.user_agent + "</td></tr>"
+                                         +"<tr><td align='left'>User</td><td align='center'>:<td align='right'>" +  d.email + "</td></tr>"
+                                         +"<tr><td align='left'>First Name</td><td align='center'>:<td align='right'>" +  d.first + "</td></tr>"
+                                         +"<tr><td align='left'>Last Name</td><td align='center'>:<td align='right'>" +  d.last + "</td></tr>" 
+                                         +"<tr><td align='left'>User Devices</td><td align='center'>:<td align='right'>" +  d.device + "</td></tr>"
+                                         +"<tr><td align='left'>File Namer</td><td align='center'>:<td align='right'>" +  d.file_name + "</td></tr>"
+                                         +"<tr><td align='left'>File Rawsize</td><td align='center'>:<td align='right'>" +  d.raw_size + "</td></tr>"
+                                         +"<tr><td align='left'>File Upload Date</td><td align='center'>:<td align='right'>" +  d.upload_date + "</td></tr>"
+                                         +"<tr><td align='left'>File Available</td><td align='center'>:<td align='right'>" +  d.available + "</td></tr>"
+                                         +"<tr><td align='left'>Link Name</td><td align='center'>:<td align='right'>" +  d.link_name + "</td></tr>"
+                                         +"<tr><td align='left'>Link Watermarked</td><td align='center'>:<td align='right'>" +  d.watermark + "</td></tr>"
+                                         +"<tr><td align='left'>Link Printable</td><td align='center'>:<td align='right'>" +  d.print + "</td></tr>"
+                                         +"<tr><td align='left'>Link Expiration</td><td align='center'>:<td align='right'>" + d.expire_date + "</td></tr>"
+                                         +"<tr><td align='left'>Link Created</td><td align='center'>:<td align='right'>" + d.link_c_date + "</td></tr>"
+                                         + "</table>")
+                                .style("left", (d3.event.pageX + 5) + "px")
+                                .style("top", (d3.event.pageY - 28) + "px");
+                        })
+                        .on("mouseout", function (d) {
+                            tooltip.transition()
+                                .duration(500)
+                                .style("opacity", 0);
+                        });
+                
+            function tick() {
+              circle
+                  .attr("cx", function(d) { return d.x; })
+                  .attr("cy", function(d) { return d.y; });
+            }
+
+            circle.call(
+                d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended));
+
+            function dragstarted(d) {
+                d3.event.sourceEvent.stopPropagation();
+                if (!d3.event.active) force.alphaTarget(0.3).restart();
+                d.fx = d.x;
+                d.fy = d.y;
+            }
+
+            function dragged(d) {
+                d.fx = d3.event.x;
+                d.fy = d3.event.y; 
+            }
+
+            function dragended(d) {
+                if (!d3.event.active) force.alphaTarget(0);
+                d.fx = null;
+                d.fy = null;
+            }
 
         },
         makeSvg(width, height){
-            var svg = d3.select("div#map-container")
+        var svg = d3.select("div#map-container")
                 .append("svg")
                 .attr("width", width)
                 .attr("height", height)
                 .append("g")
+                .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')')
                 .attr("preserveAspectRatio", "xMinYMin meet")
                 .attr("viewBox", "0 0 300 300")
                 .classed("svg-content", true)
                 .classed("svg-container", true);
+
             return svg;
+        },
+        makeG(svg, width, height){
+            var g = svg.append("g")
+                    .attr("width", width)
+                    .attr("height", height);
+            return g;
+        },
+        makeToolTip(){
+            var tooltip = d3.select("body").append("div")
+                            .attr("class", "tooltip")
+                            .style("opacity", 0);
+            return tooltip;
         }
     }
 }
