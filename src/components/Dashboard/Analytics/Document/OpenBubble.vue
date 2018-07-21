@@ -43,7 +43,6 @@ nav.toolbar.file-toolbar {
 
 <script>
 import * as d3 from 'd3';
-import * as topojson from 'topojson';
 
 export default {
     name: 'open-bubble',
@@ -80,47 +79,78 @@ export default {
             });
         },
         renderData(sessionData){
+            var width = 960;
+            var height = 500,
+            maxRadius = 12;
 
+            var n = 200,
+                m = 10;
+
+            var color = d3.scaleOrdinal(d3.schemeCategory10)
+                .domain(d3.range(m));
+
+            // The largest node for each cluster.
+            var clusters = new Array(m);
+
+            var nodes = d3.range(n).map(function() {
+              var i = Math.floor(Math.random() * m),
+                  r = Math.sqrt((i + 1) / m * -Math.log(Math.random())) * maxRadius,
+                  d = {cluster: i, radius: r};
+              if (!clusters[i] || (r > clusters[i].radius)) clusters[i] = d;
+              return d;
+            });
+
+            var forceCollide = d3.forceCollide()
+                .radius(function(d) { return d.radius + 1.5; })
+                .iterations(1);
+
+            var force = d3.forceSimulation()
+                .nodes(nodes)
+                .force("center", d3.forceCenter())
+                .force("collide", forceCollide)
+                .force("cluster", forceCluster)
+                .force("gravity", d3.forceManyBody(30))
+                .force("x", d3.forceX().strength(.7))
+                .force("y", d3.forceY().strength(.7))
+                .on("tick", tick);
+
+            var svg = this.makeSvg(path, width, height);
+
+            var circle = svg.selectAll("circle")
+                .data(nodes)
+                .enter()
+                .append("circle")
+                .attr("r", function(d) { return d.radius; })
+                .style("fill", function(d) { return color(d.cluster); });
+
+            function tick() {
+              circle
+                  .attr("cx", function(d) { return d.x; })
+                  .attr("cy", function(d) { return d.y; });
+            }
+
+            function forceCluster(alpha) {
+              for (var i = 0, n = nodes.length, node, cluster, k = alpha * 1; i < n; ++i) {
+                node = nodes[i];
+                cluster = clusters[node.cluster];
+                node.vx -= (node.x - cluster.x) * k;
+                node.vy -= (node.y - cluster.y) * k;
+              }
+            }
         },
-        getMargin(){
-            var margin = {top: 0, right: 0, bottom: 0, left: 0};
-            var width = window.innerWidth - margin.left - margin.right;
-            var height  = window.innerHeight - margin.top - margin.bottom;
+        getMargin(){     
+            var width = 960;
+            var height = 500;
             return margin;
         },
-        getProjection(width, height){
-            var projection = d3.geoEquirectangular()
-                                .translate([width / 2, height / 2])
-                                .scale(width / 2.5 / Math.PI)
-                                .rotate([0]);
-            console.log(projection);
-            return projection;
-        },
         makeSvg(path, width, height){
-            //May need cleaning in terms of the view box
-            var svg = d3.select("div#map-container")
+            var svg = d3.select("body")
                 .append("svg")
                 .attr("width", width)
                 .attr("height", height)
-                .append("g")
-                .attr("preserveAspectRatio", "xMinYMin meet")
-                .attr("viewBox", "0 0 300 300")
-                .classed("svg-content", true)
-                .classed("svg-container", true);
-            
+                .append('g')
+                .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
             return svg;
-        },
-        makeG(svg, width, height){
-            var g = svg.append("g")
-                    .attr("width", width)
-                    .attr("height", height);
-            return g;
-        },
-        makeToolTip(){
-            var tooltip = d3.select("body").append("div")
-                            .attr("class", "tooltip")
-                            .style("opacity", 0);
-            return tooltip;
         }
 
     }
