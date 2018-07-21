@@ -38,6 +38,31 @@ nav.toolbar.file-toolbar {
 .toolbar__content {
     background: white;
 }
+body { 
+    color: #666; 
+    background: white; 
+    font: normal 10px "Helvetica Neue", Helvetica, sans-serif; 
+    margin:auto;
+    position: relative;
+    text-align: center;	
+}
+
+.svg-container {
+    border:2px solid #000;
+    margin:1 auto; 
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    vertical-align: top;
+    overflow: hidden;
+}
+
+.svg-content {
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
 
 </style>
 
@@ -46,7 +71,7 @@ import * as d3 from 'd3';
 
 export default {
     name: 'open-bubble',
-    data() {
+    data(){
         return {
             searchTerm: '',
             data: [50, 90, 20, 100, 40, 50],
@@ -79,9 +104,9 @@ export default {
             });
         },
         renderData(sessionData){
-            var width = 960;
-            var height = 500,
-            maxRadius = 12;
+            var width = 860;
+            var height = 500;
+            var maxRadius = 12;
 
             var n = 200,
                 m = 10;
@@ -92,67 +117,34 @@ export default {
             // The largest node for each cluster.
             var clusters = new Array(m);
 
-            var nodes = d3.range(n).map(function() {
-              var i = Math.floor(Math.random() * m),
-                  r = Math.sqrt((i + 1) / m * -Math.log(Math.random())) * maxRadius,
-                  d = {cluster: i, radius: r};
-              if (!clusters[i] || (r > clusters[i].radius)) clusters[i] = d;
-              return d;
-            });
+            var nodes = sessionData;
+            console.log(nodes);
 
-            var forceCollide = d3.forceCollide()
-                .radius(function(d) { return d.radius + 1.5; })
-                .iterations(1);
 
-            var force = d3.forceSimulation()
-                .nodes(nodes)
-                .force("center", d3.forceCenter())
-                .force("collide", forceCollide)
-                .force("cluster", forceCluster)
-                .force("gravity", d3.forceManyBody(30))
-                .force("x", d3.forceX().strength(.7))
-                .force("y", d3.forceY().strength(.7))
-                .on("tick", tick);
-
-            var svg = this.makeSvg(path, width, height);
+            var svg = this.makeSvg(width, height);
+            
+            console.log(svg);
 
             var circle = svg.selectAll("circle")
                 .data(nodes)
                 .enter()
                 .append("circle")
-                .attr("r", function(d) { return d.radius; })
-                .style("fill", function(d) { return color(d.cluster); });
+                .attr("r", function(d) { return d.session.length; })
+                .style("fill", function(d) { return color(d.user.email); });
 
-            function tick() {
-              circle
-                  .attr("cx", function(d) { return d.x; })
-                  .attr("cy", function(d) { return d.y; });
-            }
-
-            function forceCluster(alpha) {
-              for (var i = 0, n = nodes.length, node, cluster, k = alpha * 1; i < n; ++i) {
-                node = nodes[i];
-                cluster = clusters[node.cluster];
-                node.vx -= (node.x - cluster.x) * k;
-                node.vy -= (node.y - cluster.y) * k;
-              }
-            }
         },
-        getMargin(){     
-            var width = 960;
-            var height = 500;
-            return margin;
-        },
-        makeSvg(path, width, height){
-            var svg = d3.select("body")
+        makeSvg(width, height){
+            var svg = d3.select("div#map-container")
                 .append("svg")
                 .attr("width", width)
                 .attr("height", height)
-                .append('g')
-                .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
+                .append("g")
+                .attr("preserveAspectRatio", "xMinYMin meet")
+                .attr("viewBox", "0 0 300 300")
+                .classed("svg-content", true)
+                .classed("svg-container", true);
             return svg;
         }
-
     }
 }
 </script>
