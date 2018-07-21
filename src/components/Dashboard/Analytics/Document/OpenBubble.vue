@@ -6,11 +6,7 @@
                 <v-text-field prepend-icon="search" v-model="searchTerm" hide-details single-line></v-text-field>
             </v-toolbar>
             <v-card-text>
-                <svg width="100%" height="500px">
-                    <g style="transform: translate(0, 10px)">
-                        <path :d="line" />
-                    </g>
-                </svg>
+                <div id="map-container" class="svg-container"></div>
             </v-card-text>
         </v-card>
     </v-layout>
@@ -42,10 +38,12 @@ nav.toolbar.file-toolbar {
 .toolbar__content {
     background: white;
 }
+
 </style>
 
 <script>
 import * as d3 from 'd3';
+import * as topojson from 'topojson';
 
 export default {
     name: 'open-bubble',
@@ -58,45 +56,73 @@ export default {
         }
     },
     mounted: function() {
-        this.getData();
+        //Doc Ref Id: 9c80af62b1094bdfab633019b2d10c1e
+        //this.updateMap('9c80af62b1094bdfab633019b2d10c1e');
+        //All longs and lats 52f2468e05f743ca9911abe07c196363
+        this.updateMap("52f2468e05f743ca9911abe07c196363");
 
-        this.calculatePath();
+        
     },
     created: function() {},
     methods: {
-        getData() {
+        updateMap(docRefId){
             let $this = this;
-            let linkId = '426732708eee4929bd0ecbe9a4fc0b18'
-            $this.$http.get('https://pubtest.fileopen.com/api/analytics/link/' + linkId).then(response => {
-                $this.linkData = response.body;
+            $this.$http.get('https://pubtest.fileopen.com/api/analytics/file/' + docRefId).then(response => {
+                $this.fileData = response.body;
                 // NOTE: Data is an array of entries, this prints the first entry
-                console.log($this.linkData[0]);
+                console.log($this.fileData);
 
                 // NOTE: This is where I would call it calculate the data and create the graphic
                 //       However, it currently uses static test data so it isn't necessary
+                this.renderData($this.fileData);
             }, response => {
                 console.error(response);
             });
         },
-        getScales() {
-            const x = d3.scaleTime().range([0, 430]);
-            const y = d3.scaleLinear().range([210, 0]);
-            d3.axisLeft().scale(x);
-            d3.axisBottom().scale(y);
-            x.domain(d3.extent(this.data, (d, i) => i));
-            y.domain([0, d3.max(this.data, d => d)]);
-            return {
-                x,
-                y
-            };
+        renderData(sessionData){
+
         },
-        calculatePath() {
-            const scale = this.getScales();
-            const path = d3.line()
-                .x((d, i) => scale.x(i))
-                .y(d => scale.y(d));
-            this.line = path(this.data);
+        getMargin(){
+            var margin = {top: 0, right: 0, bottom: 0, left: 0};
+            var width = window.innerWidth - margin.left - margin.right;
+            var height  = window.innerHeight - margin.top - margin.bottom;
+            return margin;
         },
+        getProjection(width, height){
+            var projection = d3.geoEquirectangular()
+                                .translate([width / 2, height / 2])
+                                .scale(width / 2.5 / Math.PI)
+                                .rotate([0]);
+            console.log(projection);
+            return projection;
+        },
+        makeSvg(path, width, height){
+            //May need cleaning in terms of the view box
+            var svg = d3.select("div#map-container")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .append("g")
+                .attr("preserveAspectRatio", "xMinYMin meet")
+                .attr("viewBox", "0 0 300 300")
+                .classed("svg-content", true)
+                .classed("svg-container", true);
+            
+            return svg;
+        },
+        makeG(svg, width, height){
+            var g = svg.append("g")
+                    .attr("width", width)
+                    .attr("height", height);
+            return g;
+        },
+        makeToolTip(){
+            var tooltip = d3.select("body").append("div")
+                            .attr("class", "tooltip")
+                            .style("opacity", 0);
+            return tooltip;
+        }
+
     }
 }
 </script>
