@@ -251,8 +251,8 @@ export default {
             var margin = this.getMargin();
             var height = window.innerHeight - margin.top - margin.bottom;
             var width = window.innerWidth - margin.left - margin.right;
-            height = 300;
-            width = 500;
+            height = 420;
+            width = 800;
             var colors = d3.scaleOrdinal(d3.schemeCategory10);
             
             //Acquiring the projection via the margin
@@ -375,7 +375,7 @@ export default {
                         })
                         .attr("width",20)
                         .attr("height",20)
-                        .attr('r', 2)
+                        .attr('r', 4)
                         .style("fill", function (d) { return colors(d.email); })
                         .style('opacity', 0.6)
                         .on("mouseover", function (d) {
