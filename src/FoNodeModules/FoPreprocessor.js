@@ -1,10 +1,10 @@
 module.exports = {
-    countData: function(data, category){
-        //Split the category by . so that we can access children
-        var path = category.split(".");
+    countData: function(data, category) {
+        // Split the category by . so that we can access children
+        var path = category.split('.');
 
         //Make labelMap - associative array
-        var labelMap = [];
+        var labelMap = new Array();
         //Loop the each data to get a session
         for(let i = 0; i < data.length; i++){
             let session = data[i];
