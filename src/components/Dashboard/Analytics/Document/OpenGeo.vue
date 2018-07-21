@@ -13,7 +13,7 @@
 </v-container>
 </template>
 
-<style scoped>
+<style>
 .toolbar__content>button.btn.btn--icon>.btn__content>i {
     color: rgba(0, 0, 0, 0.54);
 }
@@ -248,6 +248,8 @@ export default {
             });
         },
         renderData(sessionData){
+            let $this = this;
+
             var margin = this.getMargin();
             var height = window.innerHeight - margin.top - margin.bottom;
             var width = window.innerWidth - margin.left - margin.right;
@@ -272,8 +274,7 @@ export default {
             console.log("G unit:");
             console.log(g);
 
-            //Get tool tip
-            var tooltip = this.makeToolTip();
+            
 
             //Queue
             var files = ["https://raw.githubusercontent.com/sharad97/CMPS-165/master/Project/world_110m.json"];
@@ -348,6 +349,10 @@ export default {
                         });
                     console.log(data);
 
+                    //Get tool tip
+                    var tooltip = $this.makeToolTip();
+
+
                     var node = g.selectAll("circle")
                         .data(data)
                         .enter()
@@ -366,6 +371,7 @@ export default {
                         .style("fill", function (d) { return colors(d.email); })
                         .style('opacity', 0.6)
                         .on("mouseover", function (d) {
+                            console.log(tooltip);
                             tooltip.transition()
                                 .duration(200)
                                 .style("opacity", 0.9);
