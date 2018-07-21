@@ -2,6 +2,7 @@ import Dashboard from '../components/Dashboard'
 import DashboardDemo from '../components/DashboardDemo'
 import OpenGeo from '../components/Dashboard/Analytics/Document/OpenGeo'
 import OpenBubble from '../components/Dashboard/Analytics/Document/OpenBubble'
+import OpenChart from '../components/Dashboard/Analytics/Document/OpenChart'
 import DashAnalDoc from '../components/Dashboard/Analytics/Document'
 
 import NotFound from '../components/NotFound'
@@ -27,6 +28,10 @@ export default [
             {
               path: 'openbubble',
               component: OpenBubble
+            },
+            {
+              path: 'openchart',
+              component: OpenChart
             }
           ]
         }
