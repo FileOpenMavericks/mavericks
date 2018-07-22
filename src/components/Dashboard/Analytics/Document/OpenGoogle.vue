@@ -100,26 +100,27 @@ export default {
     data() {
         return {
             searchTerm: '',
+            searchVal: '',
             data: [50, 90, 20, 100, 40, 50],
             docData: null,
             line: '',
-            map: null
+            map: null,
+            overlay: null
         }
     },
     mounted: function(){
       let $this = this;
 
-      //Initializing map
-      $this.map = new google.maps.Map(d3.select("#map").node(),
-                    {
-                        zoom: 8,
-                        center: new google.maps.LatLng(37.76487, -122.41948),
-                        mapTypeId: google.maps.MapTypeId.TERRAIN
-                    });
+      
       console.log($this.map);
-      var overlay = new google.maps.OverlayView();
-      overlay.setMap($this.map);
       this.getData();
+    },
+    watch: {
+        searchTerm: function(v) {
+            console.log(v);
+            this.searchVal = v;
+            this.overlay.draw();
+        }
     },
     created: function() {},
     methods: {
@@ -142,25 +143,35 @@ export default {
           });
       },
       renderData(data, filter){
-          let $this = this;
+        let $this = this;
           
-
-        var overlay = new google.maps.OverlayView();
+        //Initializing map
+        $this.map = new google.maps.Map(d3.select("#map").node(),
+                    {
+                        zoom: 8,
+                        center: new google.maps.LatLng(37.76487, -122.41948),
+                        mapTypeId: google.maps.MapTypeId.TERRAIN
+                    });
+        $this.overlay = new google.maps.OverlayView();
         var tooltip = $this.makeToolTip();
         // Add the container when the overlay is added to the map.
-        overlay.onAdd = function() {
+        $this.overlay.onAdd = function() {
             console.log("Adding overlay");
             var layer = d3.select(this.getPanes().overlayMouseTarget).append("div")
                 .attr("class", "stations");
 
             // Draw each marker as a separate SVG element.
             // We could use a single SVG, but what size would it have?
-            overlay.draw = function() {
+            $this.overlay.draw = function() {
+                data = $this.filterData($this.docData);
                 console.log("drawing markers");
                 var projection = this.getProjection(),
                     padding = 10;
                 console.log("Data:");
                 console.log(data);
+                //Reset
+                layer.selectAll("svg").remove();
+                
                 var marker = layer.selectAll("svg")
                     .data(data)
                     .each(transform) // update existing markers
@@ -221,13 +232,37 @@ export default {
         };
 
         // Bind our overlay to the map…
-        overlay.setMap($this.map);
+        $this.overlay.setMap($this.map);
       },
       makeToolTip(){
             var tooltip = d3.select("body").append("div")
                             .attr("class", "tooltip")
                             .style("opacity", 0);
             return tooltip;
+        },
+        filterData(data){
+            let $this = this;
+            var filteredData = new Array();
+            data.forEach(function (d){
+                if($this.sessionInFilter(d)){
+                    console.log("match");
+                    filteredData.push(d);
+                }
+            });
+            return filteredData;
+        },
+        sessionInFilter(session){
+            let $this = this;
+            let searchTerm = $this.searchVal.toLowerCase();
+            console.log("Filtering...");
+            if(session.user.first.toLowerCase().includes(searchTerm) ||
+                session.user.last.toLowerCase().includes(searchTerm) ||
+                session.user.email.toLowerCase().includes(searchTerm)
+            ){
+                console.log("match");
+                return true;
+            }
+            return false;
         }
 
     }
