@@ -224,7 +224,7 @@ export default {
                 if (!d3.event.active) force.alphaTarget(0.3).restart();
                 d.fx = d.x;
                 d.fy = d.y;
-            }
+                }
 
             function dragged(d) {
                 d.fx = d3.event.x;
@@ -248,4 +248,5 @@ export default {
         }
     }
 }
+
 </script>
