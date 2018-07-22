@@ -41,7 +41,7 @@ export default {
     data () {
         return {
             items: [
-                { title: 'Link Open Location', route: 'demo', icon: 'room' },
+                // { title: 'Link Open Location', route: 'demo', icon: 'room' },
                 { title: 'Link Open Times', route: 'none', icon: 'history' }
             ],
             right: null
