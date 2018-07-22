@@ -14,7 +14,33 @@
 </template>
 
 <style>
+html, body{
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
 
+#map {
+    width: 500px;
+    height: 500px;
+}
+.stations, .stations svg {
+  position: absolute;
+}
+
+.stations svg {
+  width: 60px;
+  height: 20px;
+  padding-right: 100px;
+  font: 10px sans-serif;
+}
+
+.stations circle {
+  fill: brown;
+  stroke: black;
+  stroke-width: 1.5px;
+}
 </style>
 
 <script>
@@ -28,10 +54,23 @@ export default {
             searchTerm: '',
             data: [50, 90, 20, 100, 40, 50],
             linkData: null,
-            line: ''
+            line: '',
+            map: null
         }
     },
     mounted: function(){
+      let $this = this;
+
+      //Initializing map
+      $this.map = new google.maps.Map(d3.select("#map").node(),
+                    {
+                        zoom: 8,
+                        center: new google.maps.LatLng(37.76487, -122.41948),
+                        mapTypeId: google.maps.MapTypeId.TERRAIN
+                    });
+      console.log($this.map);
+      var overlay = new google.maps.OverlayView();
+      overlay.setMap($this.map);
       this.getData();
     },
     created: function() {},

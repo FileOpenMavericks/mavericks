@@ -14,8 +14,9 @@
 </template>
 
 <style>
-.toolbar__content>button.btn.btn--icon>.btn__content>i {
+.v-toolbar__content> .v-button.btn.btn--icon>.btn__content>i {
     color: rgba(0, 0, 0, 0.54);
+    background-color: white;
 }
 
 .toolbar {
@@ -367,7 +368,7 @@ export default {
                         })
                         .attr("width",20)
                         .attr("height",20)
-                        .attr('r', 4)
+                        .attr('r', 2)
                         .style("fill", function (d) { return colors(d.email); })
                         .style('opacity', 0.6)
                         .on("mouseover", function (d) {
@@ -406,9 +407,47 @@ export default {
                                 .duration(500)
                                 .style("opacity", 0);
                         });
+                    node.call(
+                        d3.drag()
+                        .on("start", dragstarted)
+                        .on("drag", dragged)
+                        .on("end", dragended));
+
+                    graphLayout.on("tick", function() {
+                        node.attr("transform", 
+                                  function(d) { return "translate(" + d.x + "," + d.y + ")"; }
+                                 );
+                    }); 
+
+                    function dragstarted(d) {
+                        d3.event.sourceEvent.stopPropagation();
+                        if (!d3.event.active) graphLayout.alphaTarget(0.3).restart();
+                        d.fx = d.x;
+                        d.fy = d.y;
+                    }
+
+                    function dragged(d) {
+                        d.fx = d3.event.x;
+                        d.fy = d3.event.y;
+                    }
+
+                    function dragended(d) {
+                        if (!d3.event.active) graphLayout.alphaTarget(0);
+                        d.fx = null;
+                        d.fy = null;
+                    }
+
+                    
 
                     
             });
+            // zoom and pan
+            var zoom = d3.zoom()
+                        .on("zoom",function() {
+                            g.attr("transform", d3.event.transform);
+                            g.selectAll(".nodee")
+                        });
+            svg.call(zoom)
         },
         getMargin(){
             var margin = {top: 0, right: 0, bottom: 0, left: 0};
