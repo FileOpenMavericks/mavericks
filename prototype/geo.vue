@@ -6,14 +6,14 @@
                 <v-text-field prepend-icon="search" v-model="searchTerm" hide-details single-line></v-text-field>
             </v-toolbar>
             <v-card-text>
-                <div id="map-container" class="svg-container"></div>
+                <div id="container" class="svg-container"></div>
             </v-card-text>
         </v-card>
     </v-layout>
 </v-container>
 </template>
 
-<style scoped>
+<style>
 .toolbar__content>button.btn.btn--icon>.btn__content>i {
     color: rgba(0, 0, 0, 0.54);
 }
@@ -289,14 +289,15 @@ export default {
             Promise.all(promises).then(function(worldData) {
                 console.log(topojson);
                 var world_110m = topojson.feature(worldData[0],
-                                            worldData[0].objects.countries);
+                                            worldData[0].objects.countries).features;
                 //Turning json information about country polygons into vector path
                 
                 g.append("g")
                 .attr("class", "country")
                 .selectAll("country")
-                .data(world_110m.features)
-                .enter().append("path")
+                .data(world_110m)
+                .enter()
+                .append("path")
                 .attr("d", path);
 
                 var data = sessionData;
@@ -396,8 +397,8 @@ export default {
                                          +"<tr><td align='left'>Link Expiration</td><td align='center'>:<td align='right'>" + d.expire_date + "</td></tr>"
                                          +"<tr><td align='left'>Link Created</td><td align='center'>:<td align='right'>" + d.link_c_date + "</td></tr>"
                                          + "</table>")
-                                .style("left", (d3.event.pageX + 5) + "px")
-                                .style("top", (d3.event.pageY - 28) + "px");
+                                .style("left", (d3.event.pageX - 335) + "px")
+                                .style("top", (d3.event.pageY - 128) + "px");
                         })
                         .on("mouseout", function (d) {
                             tooltip.transition()
@@ -440,7 +441,6 @@ export default {
             var zoom = d3.zoom()
                 .on("zoom",function() {
                     g.attr("transform", d3.event.transform);
-                    g.selectAll(".nodee")
                 });
             svg.call(zoom)
         },
@@ -460,7 +460,7 @@ export default {
         },
         makeSvg(path, width, height){
             //May need cleaning in terms of the view box
-            var svg = d3.select("div#map-container")
+            var svg = d3.select("div#container")
                 .append("svg")
                 .attr("width", width)
                 .attr("height", height)
@@ -478,7 +478,7 @@ export default {
             return g;
         },
         makeToolTip(){
-            var tooltip = d3.select("div#map-container").append("div")
+            var tooltip = d3.select("div#container").append("div")
                             .attr("class", "tooltip")
                             .style("opacity", 0);
             return tooltip;
