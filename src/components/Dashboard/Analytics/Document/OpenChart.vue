@@ -92,7 +92,7 @@ export default {
         var data = sessionData;
 
         var max = 100;
-          var colorScale = d3.scale().quantile()
+          var colorScale = d3.scaleQuantile()
               .domain([0,buckets - 1, max])
               .range(colors);
           console.log(colorScale);
