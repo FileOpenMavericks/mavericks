@@ -2,7 +2,6 @@
 <html>
     <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <!-- Meta Tag -->
     
     <!-- D3.js Source (required)-->
     <script type="text/javascript" src="https://d3js.org/d3.v3.min.js"></script>
@@ -10,7 +9,7 @@
     <!-- CSS Stylesheet -->
     <style>
     body{
-        background-color: #E6E6E6;
+        background-color: #FFFFFF;
         margin: auto;
         position:relative;
         text-align:center;
@@ -19,11 +18,14 @@
     p{
         text-indent: 40px;
         position: relative;
+
     }
 
 
     .axis text {
         font: 10px sans-serif;
+
+
     }
 
     .axis path,
@@ -35,8 +37,9 @@
 
     .axis text  {
         font: 10px Times;
-        font-size: 12px;
+        font-size: 16px;
         font-weight: bold;
+        color: white;
     }
         
     </style> 
@@ -125,7 +128,8 @@
     .json file use d3.tsv() or d3.json(), respectively.
     ----------------------------------------------------------------------*/
 
-
+    //Preprocessor with raw data
+    // info = getinformation from raw data
 
     // file.json contains the number of opens and name of opens per user
         
@@ -188,9 +192,9 @@
 
 
 
-                // create increasing to decreasing shade of blue as shown on the output 
-                "fill": function (d, i) { return "rgb(0, 0, " + (i * 15) + ")"; }
-                //Fills the rectangle with color from increasing to decreasing shade of blue color
+
+                "fill": function (d, i) { return "rgb(255, 105, " + (i * 20) + ")"; }
+                //Fills the rectangle with color from increasing to decreasing shade
 
             });
 
@@ -243,7 +247,7 @@
         // Draw yAxis and postion the label
         svg.append("g")
             .attr("class", "y axis")
-            .attr("transform", "translate(0," + (width - 670) + ")")
+            .attr("transform", "translate(0," + (width - 690) + ")")
             .call(yAxis)
             .selectAll("text")
             //Selects all text element.
@@ -252,13 +256,11 @@
             .attr("dy", ".30em")
             //Moves text vertically.
             .style("text-anchor", "end")
-            //This makes it easy to align the text as the transform is applied to the anchor.
-            //End of the text string is at the initial current text position.
             .attr("font-size", "10px");
 
 
 
-        //Displays the text "Trillions of US Dollars ($)"
+        //Displays the text
         svg.append("text")
             .attr("text-anchor", "middle")
             //This makes it easy to centre the text as the transform is applied to the anchor.
@@ -268,12 +270,14 @@
             //Moves text vertically.
             .attr("dy", "-2.25em")
             //Moves text horizontaly.
-            .text("Trillions of US Dollars ($)");
-            //Text in ("") will display.
+            .text("Number of Opens per User");
+    
     });
     </script> 
     
     <!-- ADD YOUR NAME. REQUIRED -->
-    <p>Sharad Shrestha</p>
+    <p>Unique Users</p>
+
+
   </body>
 </html>
