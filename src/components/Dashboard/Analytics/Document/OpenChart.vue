@@ -90,18 +90,44 @@ export default {
               .attr("class", function(d, i) { return ((i >= 7 && i <= 16) ? "monthLabel mono axis axis-worktime" : "timeLabel mono axis"); });
 
         var data = sessionData;
-
+      function(data){
         var max = 100;
           var colorScale = d3.scaleQuantile()
               .domain([0,buckets - 1, max])
               .range(colors);
-          console.log(colorScale);
-          // var cards = svg.selectAll(".month")
-          //     .data(data, function(d){
-          //       return d
-          //     })
 
+          //this is where we build the datetime function after using the parsing function
+          var cards = svg.selectAll(".month")
+              .data(data, function(d) {return d;});
 
+          cards.append("title");
+
+          cards.enter().append("rect")
+                .attr("x", function(d) { return()})
+                .attr("y", function(d) { return()})
+                .attr("rx", 4)
+                .attr("ry", 4)
+                .attr("class", "hour bordered")
+                .attr("width", gridSize)
+                .attr("height", gridSize)
+                .style("fill", colors[0]);
+
+          cards.transition().duration(1000)
+                .style("fill", function(d) { return colorScale()});
+
+          cards.select("title").text(function (d){ return });
+
+          cards.exit().remove();
+
+          var legend = svg.selectAll(".legend")
+              .data([0].concat(colorScale.quantile()), function (d) {return });
+
+          legend.enter().append("g")
+                .attr("class", "legend");
+
+          legend.append("rect")
+                .attr("x", function (d))
+)        }
       }
     }
 }
