@@ -41,6 +41,54 @@ html, body{
   stroke: black;
   stroke-width: 1.5px;
 }
+
+.tooltip {
+                width: 500px;
+                height: auto;
+                font: 14px sans-serif;
+                font-weight: bold;
+                border-radius: 5px;
+                padding: 3px 3px 3px 3px;
+                position:absolute;			
+                background: SeaGreen;	
+                border: solid black 2px;
+                border-radius: 8px;			
+                pointer-events: none;
+                margin-left: 15px;
+                color:white;
+            }
+
+            .tooltips {
+                width: 500px;
+                height: auto;
+                font: 14px sans-serif;
+                font-weight: bold;
+                border-radius: 5px;
+                padding: 3px 3px 3px 3px;
+                position:absolute;			
+                background: SeaGreen;	
+                border: solid black 2px;
+                border-radius: 8px;			
+                pointer-events: none;
+                margin-left: 15px;
+                color:white;
+            }
+
+            .tooltips1 {
+                width: 500px;
+                height: auto;
+                font: 14px sans-serif;
+                font-weight: bold;
+                border-radius: 5px;
+                padding: 3px 3px 3px 3px;
+                position:absolute;			
+                background: SeaGreen;	
+                border: solid black 2px;
+                border-radius: 8px;			
+                pointer-events: none;
+                margin-left: 15px;
+                color:white;
+            }
 </style>
 
 <script>
@@ -53,7 +101,7 @@ export default {
         return {
             searchTerm: '',
             data: [50, 90, 20, 100, 40, 50],
-            linkData: null,
+            docData: null,
             line: '',
             map: null
         }
@@ -77,20 +125,111 @@ export default {
     methods: {
       getData() {
           let $this = this;
-          let linkId = '426732708eee4929bd0ecbe9a4fc0b18'
-          $this.$http.get('https://pubtest.fileopen.com/api/analytics/link/' + linkId).then(response => {
-              $this.linkData = response.body;
+          let docRefId = "52f2468e05f743ca9911abe07c196363";
+          $this.$http.get('https://pubtest.fileopen.com/api/analytics/file/' + docRefId).then(response => {
+              $this.docData = response.body;
               // NOTE: Data is an array of entries, this prints the first entry
-              console.log($this.linkData);
-              var output = foPp.countData(this.linkData, "user.email");
+              console.log("Doc data");
+              console.log($this.docData);
+              var output = foPp.countData(this.docData, "user.email");
               console.log(output);
+              $this.renderData($this.docData, null);
 
               // NOTE: This is where I would call it calculate the data and create the graphic
               //       However, it currently uses static test data so it isn't necessary
           }, response => {
               console.error(response);
           });
-      }
+      },
+      renderData(data, filter){
+          let $this = this;
+          
+
+        var overlay = new google.maps.OverlayView();
+        var tooltip = $this.makeToolTip();
+        // Add the container when the overlay is added to the map.
+        overlay.onAdd = function() {
+            console.log("Adding overlay");
+            var layer = d3.select(this.getPanes().overlayMouseTarget).append("div")
+                .attr("class", "stations");
+
+            // Draw each marker as a separate SVG element.
+            // We could use a single SVG, but what size would it have?
+            overlay.draw = function() {
+                console.log("drawing markers");
+                var projection = this.getProjection(),
+                    padding = 10;
+                console.log("Data:");
+                console.log(data);
+                var marker = layer.selectAll("svg")
+                    .data(data)
+                    .each(transform) // update existing markers
+                    .enter().append("svg")
+                    .each(transform)
+                    .attr("class", "marker")
+                    .on("mouseover", function (d) {
+                            console.log("Mousing over");
+                            console.log(tooltip);
+                            tooltip.transition()
+                                .duration(200)
+                                .style("opacity", 0.9);
+                            tooltip.html( "<table>"
+                                         +"<tr><td align='left'>User</td><td align='center'>:<td align='right'>" +  d.user.email + "</td></tr>"
+                                         + "</table>")
+                                .style("left", (d3.event.pageX + 5) + "px")
+                                .style("top", (d3.event.pageY - 28) + "px");
+                        })
+                        .on("mouseout", function (d) {
+                            tooltip.transition()
+                                .duration(500)
+                                .style("opacity", 0);
+                        });;
+
+                // Add a circle.
+                marker.append("circle")
+                    .attr("r", 4.5)
+                    .attr("cx", padding)
+                    .attr("cy", padding);
+
+                // Add a label.
+                marker.append("text")
+                    .attr("x", padding + 7)
+                    .attr("y", padding)
+                    .attr("dy", ".31em")
+                    .text(function(d) { return d.key; });
+
+                function transform(d) {
+                    console.log("D:");
+                    console.log(d);
+                    d.lat = 0;
+                    if(d.location.lat){
+                        d.lat = parseFloat(d.location.lat);
+                    }
+                    d.lon = 0;
+                    if(d.location.lon){
+                        d.lon = parseFloat(d.location.lon);        
+                    }
+                    console.log("Transformed d");
+                    console.log(d);
+                    d = new google.maps.LatLng(d.lat, d.lon);
+                    d = projection.fromLatLngToDivPixel(d);
+                    return d3.select(this)
+                        .style("left", (d.x - padding) + "px")
+                        .style("top", (d.y - padding) + "px");
+                }
+            };
+        };
+
+        // Bind our overlay to the map…
+        overlay.setMap($this.map);
+      },
+      makeToolTip(){
+            var tooltip = d3.select("body").append("div")
+                            .attr("class", "tooltip")
+                            .style("opacity", 0);
+            return tooltip;
+        }
+
     }
 }
 </script>
