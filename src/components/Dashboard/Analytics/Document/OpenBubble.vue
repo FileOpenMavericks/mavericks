@@ -12,7 +12,7 @@
 </v-container>
 </template>
 
-<style scoped>
+<style>
 .toolbar__content>button.btn.btn--icon>.btn__content>i {
     color: rgba(0, 0, 0, 0.54);
 }
@@ -198,8 +198,8 @@ export default {
                                          +"<tr><td align='left'>Cluster</td><td align='center'>:<td align='right'>" + d.cluster + "</td></tr>"
                                          +"<tr><td align='left'>Radius</td><td align='center'>:<td align='right'>" + d.radius + "</td></tr>"
                                          + "</table>")
-                                .style("left", (d3.event.pageX + 5) + "px")
-                                .style("top", (d3.event.pageY - 28) + "px");
+                                .style("left", (d3.event.pageX - 335) + "px")
+                                .style("top", (d3.event.pageY - 128) + "px");
                         })
                         .on("mouseout", function (d) {
                             tooltip.transition()
