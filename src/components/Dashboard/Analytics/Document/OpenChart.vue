@@ -61,8 +61,8 @@ export default {
             buckets = 9,
             colors = ["#ffffd9","#edf8b1","#c7e9b4","#7fcdbb","#41b6c4","#1d91c0","#225ea8","#253494","#081d58"], // alternatively colorbrewer.YlGnBu[9]
             days = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
-            times = ["1a", "2a", "3a", "4a", "5a", "6a", "7a", "8a", "9a", "10a", "11a", "12a", "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p", "10p", "11p", "12p"];
-            console.log("QDDWD@QF@F@F@EF@");
+            months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Nov", "Oct", "Dec"];
+
         var svg = d3.select("#heatChart-container").append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
@@ -79,15 +79,29 @@ export default {
               .attr("transform", "translate(-6," + gridSize / 1.5 + ")")
               .attr("class", function (d, i) { return ((i >= 0 && i <= 4) ? "dayLabel mono axis axis-workweek" : "dayLabel mono axis"); });
 
-        var timeLabels = svg.selectAll(".timeLabel")
-            .data(times)
+        var monthLabels = svg.selectAll(".monthLabel")
+            .data(months)
             .enter().append("text")
               .text(function(d) { return d; })
               .attr("x", function(d, i) { return i * gridSize; })
               .attr("y", 0)
               .style("text-anchor", "middle")
               .attr("transform", "translate(" + gridSize / 2 + ", -6)")
-              .attr("class", function(d, i) { return ((i >= 7 && i <= 16) ? "timeLabel mono axis axis-worktime" : "timeLabel mono axis"); });
+              .attr("class", function(d, i) { return ((i >= 7 && i <= 16) ? "monthLabel mono axis axis-worktime" : "timeLabel mono axis"); });
+
+        var data = sessionData;
+
+        var max = 100;
+          var colorScale = d3.scale().quantile()
+              .domain([0,buckets - 1, max])
+              .range(colors);
+          console.log(colorScale);
+          // var cards = svg.selectAll(".month")
+          //     .data(data, function(d){
+          //       return d
+          //     })
+
+
       }
     }
 }
