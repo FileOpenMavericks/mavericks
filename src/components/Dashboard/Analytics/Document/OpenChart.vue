@@ -14,7 +14,24 @@
 </template>
 
 <style>
+rect.bordered {
+  stroke: #E6E6E6;
+  stroke-width:2px;
+}
 
+text.mono {
+  font-size: 9pt;
+  font-family: Consolas, courier;
+  fill: #aaa;
+}
+
+text.axis-workweek {
+  fill: #000;
+}
+
+text.axis-worktime {
+  fill: #000;
+}
 </style>
 
 <script>
@@ -89,46 +106,71 @@ export default {
               .attr("transform", "translate(" + gridSize / 2 + ", -6)")
               .attr("class", function(d, i) { return ((i >= 7 && i <= 16) ? "monthLabel mono axis axis-worktime" : "timeLabel mono axis"); });
 
-        var data = sessionData;
-      function(data){
-        var max = 100;
+          // function that grabs month and day
+
+
+          var data = [
+          	{
+          		"day": 1,
+          		"hour": 1,
+          		"value": 16
+          	},
+          	{
+          		"day": 1,
+          		"hour": 2,
+          		"value": 20
+          	}];
+            data.forEach(function(element){
           var colorScale = d3.scaleQuantile()
-              .domain([0,buckets - 1, max])
+              .domain([0,buckets - 1, 100])
               .range(colors);
 
-          //this is where we build the datetime function after using the parsing function
-          var cards = svg.selectAll(".month")
-              .data(data, function(d) {return d;});
-
-          cards.append("title");
-
-          cards.enter().append("rect")
-                .attr("x", function(d) { return()})
-                .attr("y", function(d) { return()})
-                .attr("rx", 4)
-                .attr("ry", 4)
-                .attr("class", "hour bordered")
-                .attr("width", gridSize)
-                .attr("height", gridSize)
-                .style("fill", colors[0]);
-
-          cards.transition().duration(1000)
-                .style("fill", function(d) { return colorScale()});
-
-          cards.select("title").text(function (d){ return });
-
-          cards.exit().remove();
-
+          // //this is where we build the datetime function after using the parsing function
+          // var cards = svg.selectAll(".month")
+          //     .data(sessionData), function(d) {return d;});
+          //
+          // cards.append("title");
+          //
+          // cards.enter().append("rect")
+          //       .attr("x", function(d) { return()})
+          //       .attr("y", function(d) { return()})
+          //       .attr("rx", 4)
+          //       .attr("ry", 4)
+          //       .attr("class", "month bordered")
+          //       .attr("width", gridSize)
+          //       .attr("height", gridSize)
+          //       .style("fill", colors[0]);
+          //
+          // cards.transition().duration(1000)
+          //       .style("fill", function(d) { return colorScale()});
+          //
+          // cards.select("title").text(function (d){ return });
+          //
+          // cards.exit().remove();
+          console.log("making legend");
           var legend = svg.selectAll(".legend")
-              .data([0].concat(colorScale.quantile()), function (d) {return });
-
+              .data([0].concat(colorScale.quantiles()), data.value);
+          console.log("Svg")
+          console.log(svg.data([0]));
           legend.enter().append("g")
                 .attr("class", "legend");
 
           legend.append("rect")
-                .attr("x", function (d))
-)        }
-      }
-    }
+                .attr("x", function(d, i) { return legendElementWidth * i; })
+                .attr("y", height)
+                .attr("width", legendElementWidth)
+                .attr("height", gridSize / 2)
+                .style("fill", function(d, i) { return colors[i]; });
+
+          legend.append("text")
+                .attr("class", "mono")
+                .text(function(d) { return "≥ " + Math.round(d); })
+                .attr("x", function(d, i) { return legendElementWidth * i; })
+                .attr("y", height + gridSize);
+
+          legend.exit().remove();
+        });
+  }
+},
 }
 </script>
