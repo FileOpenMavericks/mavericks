@@ -82,7 +82,7 @@ export default {
       //counts the entries by email
 
       //Now render data
-      var margin = {top: 60, right: 20, bottom: 50, left: 50},
+      var margin = {top: 60, right: 20, bottom: 200, left: 50},
         //Sets margin for graphing area.
         //Margin generates space around elements. 
         //Each side of the element can be customizable by using top, right, bottom, and left. 
@@ -175,22 +175,75 @@ export default {
             .attr("width", xScale.bandwidth())
             .attr("height", function (d) {return height - yScale(d.value)})
             .attr("fill", function (d, i) { return "rgb(255, 105, " + (i * 20) + ")";});
-            // .attr({
-            //     "x": function (d) { var x = xScale(d.key);
-            //                         console.log("X scale:" + x);
-            //                         return x;
-            //     },
-            //     "y": function (d) { return yScale(d.value); },
-            //     "width": xScale.bandwidth(),
-            //     "height": function (d) { return height - yScale(d.value); },
 
+        svg.selectAll("text")
+            .data(data)
+            .enter()
+            .append("text")
+            .text(function (d) {
+                return d.value;
+            })
+            .attr("x", function (d) {
+                return xScale(d.key);
+            })
+            .attr("y", function (d) {
+                return yScale(d.value);
+            })
+            .attr("font-family", "sans-serif")
+            .attr("font-size", "11px")
+            .attr("fill", "White")
+            .attr("dx", "1.8em")
+            //Moves text horizontaly.
+            .attr("dy", ".85em")
+            //Moves text verticaly.
+            .style("text-anchor", "middle");
 
+        // Draw xAxis and position the label at -60 degrees as shown on the output
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + (height + 0.1) + ")")
+            .call(xAxis)
+            .selectAll("text")
+            //Selects all text in x axis.
+            .attr("dx", ".1em")
+            //Moves text verticaly.
+            .attr("dy", "-.65em")
+            //Moves text horizontaly.
+            .style("text-anchor", "end")
+            .attr("font-size", "6px")
+            .attr("transform", function (d) {
+                return "translate(" + this.getBBox().height * 0.1 + "," + this.getBBox().height + ")rotate(-60)";
+                //Rotates text in x axis -60 degree.
+            });
 
+        // Draw yAxis and postion the label
+        svg.append("g")
+            .attr("class", "y axis")
+            .attr("transform", "translate(0," + (width - 690) + ")")
+            .call(yAxis)
+            .selectAll("text")
+            //Selects all text element.
+            .attr("dx", ".1em")
+            //Moves text horizontaly.
+            .attr("dy", ".30em")
+            //Moves text vertically.
+            .style("text-anchor", "end")
+            .attr("font-size", "10px");
 
-            //     "fill": function (d, i) { return "rgb(255, 105, " + (i * 20) + ")"; }
-            //     //Fills the rectangle with color from increasing to decreasing shade
+        //Displays the text
+        svg.append("text")
+            .attr("text-anchor", "middle")
+            //This makes it easy to centre the text as the transform is applied to the anchor.
+            .attr("transform", "translate(0," + (width - 450) + ")rotate(-90)")
+            //Text is drawn off the screen top left, move down and out and rotate.
+            .attr("dx", "2em")
+            //Moves text vertically.
+            .attr("dy", "-2.25em")
+            //Moves text horizontaly.
+            .text("Number of Opens per User");
 
-            // });
+        
+
         
 
     }
