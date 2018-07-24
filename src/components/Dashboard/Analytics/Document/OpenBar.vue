@@ -171,9 +171,12 @@ export default {
             .attr("height", 0)
             .attr("y", height)
             .attr("x", function (d) {return xScale(d.key)})
-            .attr("y", function (d){ return yScale(d.value)})
+            .transition()
+            .duration(1000)
+            .ease(d3.easeQuad)
             .attr("width", xScale.bandwidth())
             .attr("height", function (d) {return height - yScale(d.value)})
+            .attr("y", function (d){ return yScale(d.value)})
             .attr("fill", function (d, i) { return "rgb(255, 105, " + (i * 20) + ")";});
 
         svg.selectAll("text")
