@@ -91,13 +91,9 @@ export default {
         var  dollar_sign = d3.format("$");
             //Variable is created known as the dollar_sign with value $
 
-        var xAxis = d3.svg.axis()
-            .scale(xScale)
-            .orient("bottom");
+        var xAxis = d3.axisBottom(xScale);
 
-        var yAxis = d3.svg.axis()
-            .scale(yScale)
-            .orient("left")
+        var yAxis = d3.axisLeft(yScale)
             .ticks(5)
             //Creats interval of 5 in y axis.
             .tickFormat(dollar_sign);
