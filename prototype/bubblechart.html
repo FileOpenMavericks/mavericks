@@ -2,21 +2,21 @@
 <meta charset="utf-8">
 <title>bubble chart</title>
 <style>
-            .tooltip {
-                width: 500px;
-                height: auto;
-                font: 14px sans-serif;
-                font-weight: bold;
-                border-radius: 5px;
-                padding: 3px 3px 3px 3px;
-                position:absolute;			
-                background: SeaGreen;	
-                border: solid black 2px;
-                border-radius: 8px;			
-                pointer-events: none;
-                margin-left: 15px;
-                color:white;
-            }
+    .tooltip {
+        width: 500px;
+        height: auto;
+        font: 14px sans-serif;
+        font-weight: bold;
+        border-radius: 5px;
+        padding: 3px 3px 3px 3px;
+        position:absolute;			
+        background: SeaGreen;	
+        border: solid black 2px;
+        border-radius: 8px;			
+        pointer-events: none;
+        margin-left: 15px;
+        color:white;
+    }
 </style>
 <body>
     <script src="https://d3js.org/d3.v5.js"></script>
@@ -27,15 +27,11 @@
         var width = 960;
         var height = 500;
         var maxRadius = 12;
-
         var n = 200;
         var m = 10;
-
         var color = d3.scaleOrdinal(d3.schemeCategory10)
             .domain(d3.range(m));
-
         var clusters = new Array(m);
-
         var nodes = d3.range(n).map(function() {
           var i = Math.floor(Math.random() * m);
           var r = Math.sqrt((i + 1) / m * -Math.log(Math.random())) * maxRadius;
@@ -48,7 +44,6 @@
         var forceCollide = d3.forceCollide()
             .radius(function(d) { return d.radius + 1.5; })
             .iterations(1);
-
         var force = d3.forceSimulation()
             .nodes(nodes)
             .force("center", d3.forceCenter())
@@ -58,7 +53,6 @@
             .force("x", d3.forceX().strength(0.2))
             .force("y", d3.forceY().strength(0.2))
             .on("tick", tick);
-
         var svg = d3.select("div#map-container")
                 .append("svg")
                 .attr("width", width)
@@ -69,11 +63,71 @@
                 .attr("viewBox", "0 0 300 300")
                 .classed("svg-content", true)
                 .classed("svg-container", true);
-
         var g = svg.append("g")
             .attr("width", width)
             .attr("height", height);
+        
+        
+        g.append("rect")
+            .attr("x", width - 750)
+            .attr("y", height - 425)
+            .attr("width", 120)
+            .attr("height", 150)
+            .attr("fill", "lightgrey")
+            .style("stroke-size", "1px");
 
+        g.append("circle")
+            .attr("r", 3)
+            .attr("cx", width - 660)
+            .attr("cy", height - 300)
+            .style("fill", "blue");
+
+        g.append("circle")
+            .attr("r", 5)
+            .attr("cx", width - 660)
+            .attr("cy", height - 330)
+            .style("fill", "blue");
+
+        g.append("circle")
+            .attr("r", 7)
+            .attr("cx", width - 660)
+            .attr("cy", height - 360)
+            .style("fill", "blue");
+        
+        g.append("circle")
+            .attr("r", 9)
+            .attr("cx", width - 660)
+            .attr("cy", height - 390)
+            .style("fill", "blue");
+
+        g.append("text")
+            .attr("class", "label")
+            .attr("x", width - 700)
+            .attr("y", height - 300)
+            .style("text-anchor", "end")
+            .text("Three");
+
+        g.append("text")
+            .attr("class", "label")
+            .attr("x", width - 708)
+            .attr("y", height - 330)
+            .style("text-anchor", "end")
+            .text("Five");
+
+        g.append("text")
+            .attr("class", "label")
+            .attr("x", width - 700)
+            .attr("y", height - 360)
+            .style("text-anchor", "end")
+            .text("Seven");
+        
+        g.append("text")
+            .attr("class", "label")
+            .attr("x", width - 708)
+            .attr("y", height - 390)
+            .style("text-anchor", "end")
+            .text("Nine");
+        
             // zoom and pan
         var zoom = d3.zoom()
             .on("zoom",function() {
@@ -92,7 +146,7 @@
             .append("circle")
             .attr("r", function(d) { return d.radius; })
             .style("fill", function(d) { return color(d.cluster); })
-        .on("mouseover", function (d) {
+            .on("mouseover", function (d) {
                             tooltip.transition()
                                 .duration(200)
                                 .style("opacity", 0.9);
@@ -108,13 +162,11 @@
                                 .duration(500)
                                 .style("opacity", 0);
                         });
-
         function tick() {
           circle
               .attr("cx", function(d) { return d.x; })
               .attr("cy", function(d) { return d.y; });
         }
-
         circle.call(
             d3.drag()
             .on("start", dragstarted)
@@ -127,12 +179,11 @@
             d.fx = d.x;
             d.fy = d.y;
         }
-
         function dragged(d) {
-            d.fx = d3.event.x;
-            d.fy = d3.event.y; 
+              d3.select(this)
+                  .attr("cx", d.fx = d3.event.x)
+                  .attr("cy", d.fy = d3.event.y);
         }
-
         function dragended(d) {
             if (!d3.event.active) force.alphaTarget(0);
             d.fx = null;
@@ -143,7 +194,6 @@
             force.nodes(nodes);
             force.force("cluster", forceCluster);
             force.alpha(1).restart();
-
             
             function forceCluster(alpha) {
                 for (var i = 0, n = nodes.length, node, cluster, k = alpha * 1; i < n; ++i) {
@@ -169,5 +219,4 @@
                 }
             }
         }
-
     </script>
