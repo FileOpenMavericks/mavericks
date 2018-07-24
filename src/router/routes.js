@@ -9,42 +9,42 @@ import DashAnalDoc from '../components/Dashboard/Analytics/Document'
 import NotFound from '../components/NotFound'
 
 export default [
-    {
-      path: '/',
-      name: 'Dashboard',
-      component: Dashboard,
-      children: [
-        {
-            path: 'demo',
-            component: DashboardDemo
-        },
-        {
-          path: 'document',
-          component: DashAnalDoc,
-          children: [
-            {
-              path: 'opengeo',
-              component: OpenGeo
-            },
-            {
-              path: 'opengoogle',
-              component: OpenGoogle
-            },
-            {
-              path: 'openbubble',
-              component: OpenBubble
-            },
-            {
-              path: 'openchart',
-              component: OpenChart
-            }
-          ]
-        }
-      ]
-    },
-    {
-      path: '*',
-      name: 'NotFound',
-      component: NotFound
-    }
+  {
+    path: '/',
+    name: 'Dashboard',
+    component: Dashboard,
+    children: [
+      {
+        path: 'demo',
+        component: DashboardDemo
+      },
+      {
+        path: 'document',
+        component: DashAnalDoc,
+        children: [
+          {
+            path: 'opengeo',
+            component: OpenGeo
+          },
+          {
+            path: 'opengoogle',
+            component: OpenGoogle
+          },
+          {
+            path: 'openbubble',
+            component: OpenBubble
+          },
+          {
+            path: 'openchart',
+            component: OpenChart
+          }
+        ]
+      }
+    ]
+  },
+  {
+    path: '*',
+    name: 'NotFound',
+    component: NotFound
+  }
 ]

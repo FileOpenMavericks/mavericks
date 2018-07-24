@@ -37,15 +37,15 @@ a {
 
 <script>
 export default {
-    name: 'dashboard',
-    data () {
-        return {
-            items: [
-                // { title: 'Link Open Location', route: 'demo', icon: 'room' },
-                { title: 'Link Open Times', route: 'none', icon: 'history' }
-            ],
-            right: null
-        }
+  name: 'dashboard',
+  data () {
+    return {
+      items: [
+        // { title: 'Link Open Location', route: 'demo', icon: 'room' },
+        { title: 'Link Open Times', route: 'none', icon: 'history' }
+      ],
+      right: null
     }
+  }
 }
 </script>
