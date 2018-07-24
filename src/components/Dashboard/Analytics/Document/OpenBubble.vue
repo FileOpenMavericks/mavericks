@@ -37,6 +37,7 @@ nav.toolbar.file-toolbar {
 .toolbar__content {
     background: white;
 }
+
 body { 
     color: #666; 
     background: white; 
@@ -83,6 +84,7 @@ body {
 
 <script>
 import * as d3 from 'd3';
+import * as foPp from '../../../../FoNodeModules/FoPreprocessor'
 
 export default {
     name: 'open-bubble',
@@ -94,31 +96,28 @@ export default {
             line: ''
         }
     },
-    mounted: function() {
-        //Doc Ref Id: 9c80af62b1094bdfab633019b2d10c1e
-        //this.updateMap('9c80af62b1094bdfab633019b2d10c1e');
-        //All longs and lats 52f2468e05f743ca9911abe07c196363
-        this.updateMap("52f2468e05f743ca9911abe07c196363");
-
-        
+    mounted: function () {
+    this.getData()
+  },
+  created: function () {},
+  methods: {
+    getData () {
+      let $this = this
+      let linkId = '426732708eee4929bd0ecbe9a4fc0b18'
+      $this.$http.get('https://pubtest.fileopen.com/api/analytics/link/' + linkId).then(response => {
+        $this.linkData = response.body
+        // NOTE: Data is an array of entries, this prints the first entry
+        console.log($this.linkData)
+        var output = foPp.countData(this.linkData, 'user.email')
+        console.log(output);
+        $this.renderOpenCountData(output);
+        // NOTE: This is where I would call it calculate the data and create the graphic
+        //       However, it currently uses static test data so it isn't necessary
+      }, response => {
+        console.error(response)
+      })
     },
-    created: function() {},
-    methods: {
-        updateMap(docRefId){
-            let $this = this;
-            $this.$http.get('https://pubtest.fileopen.com/api/analytics/file/' + docRefId).then(response => {
-                $this.fileData = response.body;
-                // NOTE: Data is an array of entries, this prints the first entry
-                console.log($this.fileData);
-
-                // NOTE: This is where I would call it calculate the data and create the graphic
-                //       However, it currently uses static test data so it isn't necessary
-                this.renderData($this.fileData);
-            }, response => {
-                console.error(response);
-            });
-        },
-        renderData(sessionData){
+    renderOpenCountData(data){
             var width = 860;
             var height = 500;
             var maxRadius = 6;
@@ -131,25 +130,19 @@ export default {
 
             var clusters = new Array(m);
 
-            var nodes = d3.range(n).map(function() {
-                var i = Math.floor(Math.random() * m);
-                var r = Math.sqrt((i + 1) / m * -Math.log(Math.random())) * maxRadius;
-                var d = {cluster: i, radius: r};
-                if (!clusters[i] || (r > clusters[i].radius)) clusters[i] = d;
-                return d;
-            });
+            var data = d3.entries(data);
         
-            console.log(nodes);
+            console.log(data);
             
             var forceCollide = d3.forceCollide()
             .radius(function(d) { return d.radius + 1.5; })
             .iterations(1);
 
             var force = d3.forceSimulation()
-                .nodes(nodes)
+                .nodes(data)
                 .force("center", d3.forceCenter())
                 .force("collide", forceCollide)
-                .force("cluster", forceCluster)
+                //.force("cluster", forceCluster)
                 .force("gravity", d3.forceManyBody(20))
                 .force("x", d3.forceX().strength(0.7))
                 .force("y", d3.forceY().strength(0.7))
@@ -170,6 +163,66 @@ export default {
                 .attr("width", width)
                 .attr("height", height);
                 
+            g.append("rect")
+                .attr("x", width - 750)
+                .attr("y", height - 425)
+                .attr("width", 120)
+                .attr("height", 150)
+                .attr("fill", "lightgrey")
+                .style("stroke-size", "1px");
+
+            g.append("circle")
+                .attr("r", 3)
+                .attr("cx", width - 660)
+                .attr("cy", height - 300)
+                .style("fill", "blue");
+
+            g.append("circle")
+                .attr("r", 5)
+                .attr("cx", width - 660)
+                .attr("cy", height - 330)
+                .style("fill", "blue");
+
+            g.append("circle")
+                .attr("r", 7)
+                .attr("cx", width - 660)
+                .attr("cy", height - 360)
+                .style("fill", "blue");
+
+            g.append("circle")
+                .attr("r", 9)
+                .attr("cx", width - 660)
+                .attr("cy", height - 390)
+                .style("fill", "blue");
+
+            g.append("text")
+                .attr("class", "label")
+                .attr("x", width - 700)
+                .attr("y", height - 300)
+                .style("text-anchor", "end")
+                .text("Three");
+
+            g.append("text")
+                .attr("class", "label")
+                .attr("x", width - 708)
+                .attr("y", height - 330)
+                .style("text-anchor", "end")
+                .text("Five");
+
+            g.append("text")
+                .attr("class", "label")
+                .attr("x", width - 700)
+                .attr("y", height - 360)
+                .style("text-anchor", "end")
+                .text("Seven");
+
+            g.append("text")
+                .attr("class", "label")
+                .attr("x", width - 708)
+                .attr("y", height - 390)
+                .style("text-anchor", "end")
+                .text("Nine");
+                
             var zoom = d3.zoom()
                 .on("zoom",function() {
                     g.attr("transform", d3.event.transform);
@@ -183,20 +236,20 @@ export default {
                             .attr("class", "tooltip")
                             .style("opacity", 0);
 
-            var circle = g.selectAll("circle")
-                .data(nodes)
+            var circle = g.selectAll("circles")
+                .data(data)
                 .enter()
                 .append("g")
                 .append("circle")
-                .attr("r", function(d) { return d.radius; })
-                .style("fill", function(d) { return color(d.cluster); })
+                .attr("r", function(d) { return d.value; })
+                .style("fill", function(d) { return color(d.value); })
                 .on("mouseover", function (d) {
                             tooltip.transition()
                                 .duration(200)
                                 .style("opacity", 0.9);
                             tooltip.html( "<table>"
-                                         +"<tr><td align='left'>Cluster</td><td align='center'>:<td align='right'>" + d.cluster + "</td></tr>"
-                                         +"<tr><td align='left'>Radius</td><td align='center'>:<td align='right'>" + d.radius + "</td></tr>"
+                                         +"<tr><td align='left'>User</td><td align='center'>:<td align='right'>" + d.key + "</td></tr>"
+                                         +"<tr><td align='left'>Numbver of file open</td><td align='center'>:<td align='right'>" + d.value + "</td></tr>"
                                          + "</table>")
                                 .style("left", (d3.event.pageX - 335) + "px")
                                 .style("top", (d3.event.pageY - 128) + "px");
@@ -236,15 +289,7 @@ export default {
                 d.fx = null;
                 d.fy = null;
             }
-            
-            function forceCluster(alpha) {
-                    for (var i = 0, n = nodes.length, node, cluster, k = alpha * 1; i < n; ++i) {
-                        node = nodes[i];
-                        cluster = clusters[node.cluster];
-                        node.vx -= (node.x - cluster.x) * k;
-                        node.vy -= (node.y - cluster.y) * k;
-                    }
-                }
+
         }
     }
 }
