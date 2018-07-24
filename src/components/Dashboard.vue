@@ -42,7 +42,8 @@ export default {
     return {
       items: [
         // { title: 'Link Open Location', route: 'demo', icon: 'room' },
-        { title: 'Link Open Times', route: 'none', icon: 'history' }
+        { title: 'Link Open Times', route: '/document/openbar', icon: 'history' },
+        {title: 'Link Open Locations', route: '/document/opengoogle'}
       ],
       right: null
     }
