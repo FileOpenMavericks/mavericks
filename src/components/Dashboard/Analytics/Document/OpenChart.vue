@@ -120,6 +120,9 @@ export default {
           		"hour": 2,
           		"value": 20
           	}];
+
+            // currently, we are using the above sample data set to test the features in the heat chart
+            // with the forEach() function
             data.forEach(function(element){
           var colorScale = d3.scaleQuantile()
               .domain([0,buckets - 1, 100])

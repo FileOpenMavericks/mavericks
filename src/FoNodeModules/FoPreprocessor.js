@@ -12,7 +12,7 @@ module.exports = {
             for(let j = 1; j < path.length; j++){
                 key = key[path[j]];
             }
-            
+
             if(labelMap[key]){
                 ++labelMap[key];
             }else{
