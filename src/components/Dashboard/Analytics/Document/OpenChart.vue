@@ -108,7 +108,8 @@ export default {
 
           // function that grabs month and day
 
-
+          // currently using this as sample data for the legend and cards to appear before
+          // using the function to grab month and day
           var data = [
           	{
           		"day": 1,
@@ -128,33 +129,32 @@ export default {
               .domain([0,buckets - 1, 100])
               .range(colors);
 
-          // //this is where we build the datetime function after using the parsing function
-          // var cards = svg.selectAll(".month")
-          //     .data(sessionData), function(d) {return d;});
-          //
-          // cards.append("title");
-          //
-          // cards.enter().append("rect")
-          //       .attr("x", function(d) { return()})
-          //       .attr("y", function(d) { return()})
-          //       .attr("rx", 4)
-          //       .attr("ry", 4)
-          //       .attr("class", "month bordered")
-          //       .attr("width", gridSize)
-          //       .attr("height", gridSize)
-          //       .style("fill", colors[0]);
-          //
-          // cards.transition().duration(1000)
-          //       .style("fill", function(d) { return colorScale()});
-          //
-          // cards.select("title").text(function (d){ return });
-          //
-          // cards.exit().remove();
-          console.log("making legend");
+          //this is where we build the datetime function after using the parsing function
+          var cards = svg.selectAll(".month")
+              .data(data, function(d) {return data.day;});
+
+          cards.append("title");
+
+          cards.enter().append("rect")
+                .attr("x", function(d) { return(d.hour - 1) * gridSize; })
+                .attr("y", function(d) { return(d.day - 1) * gridSize})
+                .attr("rx", 4)
+                .attr("ry", 4)
+                .attr("class", "month bordered")
+                .attr("width", gridSize)
+                .attr("height", gridSize)
+                .style("fill", colors[0]);
+
+          cards.transition().duration(1000)
+                .style("fill", function(d) { return colorScale(data.value); });
+
+          cards.select("title").text(function (d){ return data.value; });
+
+          cards.exit().remove();
+
           var legend = svg.selectAll(".legend")
               .data([0].concat(colorScale.quantiles()), data.value);
-          console.log("Svg")
-          console.log(svg.data([0]));
+
           legend.enter().append("g")
                 .attr("class", "legend");
 
