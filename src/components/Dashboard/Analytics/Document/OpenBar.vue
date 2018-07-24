@@ -14,7 +14,32 @@
 </template>
 
 <style>
+  p{
+        text-indent: 40px;
+        position: relative;
 
+    }
+
+
+    .axis text {
+        font: 10px sans-serif;
+
+
+    }
+
+    .axis path,
+    .axis line {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+    }      
+
+    .axis text  {
+        font: 10px Times;
+        font-size: 16px;
+        font-weight: bold;
+        color: white;
+    }
 </style>
 
 <script>
@@ -71,7 +96,8 @@ export default {
         //The range is used for visual space.
         var xScale = d3.scaleBand()
             //(d3.scale.ordinal) has discrete data set.
-            .rangeRound([0, width], 0.1);
+            .rangeRound([0, width])
+            .padding(0.1);
             // (.rangeRoundBands) specifies the range that those values will cover and makes the bars clean and spaced properly.
             //The range is specified as being from 0 to the width of the graphing area. 
             //It make starting point from 0 and end at the end of graph.
@@ -115,6 +141,56 @@ export default {
             //This attribute applies a list of transformations to an element and sub-elments.
             //Tells the SVG Group Element, "g", to do a transformation where by it translates the element and sub-elements by 
             //moving to margin.left value from earlier code, margin.top value from earlier code.(topleft)
+        var data = d3.entries(data);
+        console.log(data);
+
+        //The domain is used for data of space.
+        //Lets D3 know what the scope of data will it have and they are then passed to the scale function.
+        xScale.domain(data.map(function (d) { return d.key; }));
+        //(function(d) { return d.key; }) returns all the 'key' values in 'data'. This is then passed to the scale function.
+        //(.map) function that finds the maximum and minimum values in the array and then passed to the scale function.
+        //The (.domain) function which returns those maximum and minimum values to D3 as the range for the x axis.
+        yScale.domain([0, d3.max(data, function (d) {return d.value; })]);
+        //Tells y axis goes from 0 to the maximum in the data range.
+        //0 is the starting point.
+
+
+        console.log("X bandwidth");
+        console.log(xScale.bandwidth());
+        // Creating rectangular bars to represent the data. 
+        // you can create circle or anytype of shape you want here.
+
+        //selection of rectangles and creates rectangles
+        console.log(height);
+        svg.selectAll("rect")
+            .data(data)
+            //Allows us to attach data of any type
+            .enter()
+            //Allows us to bind the data to the empty selection
+            .append("rect")
+            .attr("height", 0)
+            .attr("y", height)
+            .attr("x", function (d) {return xScale(d.key)})
+            .attr("y", function (d){ return yScale(d.value)})
+            .attr("width", xScale.bandwidth())
+            .attr("height", function (d) {return height - yScale(d.value)})
+            .attr("fill", function (d, i) { return "rgb(255, 105, " + (i * 20) + ")";});
+            // .attr({
+            //     "x": function (d) { var x = xScale(d.key);
+            //                         console.log("X scale:" + x);
+            //                         return x;
+            //     },
+            //     "y": function (d) { return yScale(d.value); },
+            //     "width": xScale.bandwidth(),
+            //     "height": function (d) { return height - yScale(d.value); },
+
+
+
+
+            //     "fill": function (d, i) { return "rgb(255, 105, " + (i * 20) + ")"; }
+            //     //Fills the rectangle with color from increasing to decreasing shade
+
+            // });
         
 
     }
