@@ -364,6 +364,46 @@ console.log(d);
     d.fx = null;
     d.fy = null;
   }
+        },
+        
+        add_sim: function (event) {
+            let $this = this;
+            if (event) {
+                var simulation = $this.simulation;
+                simulation.nodes($this.nodes);
+                simulation.force("cluster", forceCluster);
+                simulation.alpha(1).restart();
+                
+            function forceCluster(alpha) {
+                for (var i = 0, n = $this.nodes.length, node, cluster, k = alpha * 1; i < n; ++i) {
+                    node = $this.nodes[i];
+                    cluster = $this.clusters[node.cluster];
+                    node.vx -= (node.x - cluster.x) * k;
+                    node.vy -= (node.y - cluster.y) * k;
+                }
+            }
+            }  
+        
+        },
+        
+        remove_sim: function (event) {
+        let $this = this;
+        console.log(event)
+        if (event) {
+            console.log(event)
+            var simulation = $this.simulation;
+            simulation.nodes($this.nodes);
+            simulation.force("cluster", forceCluster);
+            simulation.alpha(1).restart();
+            
+            function forceCluster(alpha) {
+                for (var i = 0, n = $this.nodes.length, node, cluster, k = alpha * 0; i < n; ++i) {
+                    node = $this.nodes[i];
+                    cluster = $this.clusters[node.cluster];
+                    node.vx -= (node.x - cluster.x) * k;
+                    node.vy -= (node.y - cluster.y) * k;
+                }
+            }            }  
         }
         
     }
