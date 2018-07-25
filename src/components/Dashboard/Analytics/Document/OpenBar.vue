@@ -50,6 +50,7 @@ export default {
   name: 'open-chart',
   data () {
     return {
+      docId: this.$route.params.id,
       searchTerm: '',
       data: [50, 90, 20, 100, 40, 50],
       linkData: null,
@@ -63,8 +64,7 @@ export default {
   methods: {
     getData () {
       let $this = this
-      let linkId = '426732708eee4929bd0ecbe9a4fc0b18'
-      $this.$http.get('https://pubtest.fileopen.com/api/analytics/link/' + linkId).then(response => {
+      $this.$http.get('https://pubtest.fileopen.com/api/analytics/file/' + $this.docId).then(response => {
         $this.linkData = response.body
         // NOTE: Data is an array of entries, this prints the first entry
         console.log($this.linkData)

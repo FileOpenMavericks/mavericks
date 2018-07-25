@@ -42,9 +42,10 @@ export default {
     return {
       items: [
         // { title: 'Link Open Location', route: 'demo', icon: 'room' },
-        { title: 'Link Open Times', route: '/document/openbar', icon: 'history' },
-        {title: 'Link Open Locations', route: '/document/opengoogle'}
+        { title: 'Link Open Times', route: '/document/' + this.$route.params.id + '/openbar', icon: 'history' },
+        {title: 'Link Open Locations', route: '/document/' + this.$route.params.id + '/opengoogle'}
       ],
+      id: this.$route.params.id,
       right: null
     }
   }

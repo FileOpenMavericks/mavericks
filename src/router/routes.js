@@ -20,7 +20,7 @@ export default [
         component: DashboardDemo
       },
       {
-        path: 'document',
+        path: 'document/:id',
         component: DashAnalDoc,
         children: [
           {
