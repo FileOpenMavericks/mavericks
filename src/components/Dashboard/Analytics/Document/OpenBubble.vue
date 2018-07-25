@@ -118,39 +118,39 @@ export default {
         console.log(output);
         $this.renderOpenCountData(output);
         // NOTE: This is where I would call it calculate the data and create the graphic
-        //       However, it currently uses static test data so it isn't necessary
+        // However, it currently uses static test data so it isn't necessary
       }, response => {
         console.error(response)
       })
     },
     renderOpenCountData(data){
-    let $this = this;
-var margin = {top: 100, right: 100, bottom: 100, left: 100};
+        let $this = this;
+        var margin = {top: 100, right: 100, bottom: 100, left: 100};
 
-var width = 960,
-    height = 500,
-    padding = 1.5, // separation between same-color circles
-    clusterPadding = 6, // separation between different-color circles
-    maxRadius = height*0.1;
+        var width = 960,
+            height = 500,
+            padding = 1.5, // separation between same-color circles
+            clusterPadding = 6, // separation between different-color circles
+            maxRadius = height*0.1;
 
-var n = 200, // total number of nodes
-    m = 10, // number of distinct clusters
-    z = d3.scaleOrdinal(d3.schemeCategory10);
+        var n = 200, // total number of nodes
+            m = 10, // number of distinct clusters
+            z = d3.scaleOrdinal(d3.schemeCategory10);
 
-    $this.clusters = new Array(m);
-    
-    var svg = d3.select("div#map-container")
-                .append("svg")
-                .attr("width", width)
-                .attr("height", height)
-                .append("g")
-                .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')')
-                .attr("preserveAspectRatio", "xMinYMin meet")
-                .attr("viewBox", "0 0 300 300")
-                .classed("svg-content", true)
-                .classed("svg-container", true);
+        $this.clusters = new Array(m);
 
-    var g = svg.append("g")
+        var svg = d3.select("div#map-container")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .append("g")
+            .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')')
+            .attr("preserveAspectRatio", "xMinYMin meet")
+            .attr("viewBox", "0 0 300 300")
+            .classed("svg-content", true)
+            .classed("svg-container", true);
+
+        var g = svg.append("g")
             .attr("width", width)
             .attr("height", height);
         
@@ -214,23 +214,23 @@ var n = 200, // total number of nodes
             .style("text-anchor", "end")
             .text("Nine");
     
-           var zoom = d3.zoom()
+        var zoom = d3.zoom()
             .on("zoom",function() {
                 g.attr("transform", d3.event.transform);
                 g.selectAll(".node")
             });
         svg.call(zoom);
 
-// Define the div for the tooltip
-var div = d3.select("body").append("div") 
-    .attr("class", "tooltip")       
-    .style("opacity", 0);
+        // Define the div for the tooltip
+        var div = d3.select("body").append("div") 
+            .attr("class", "tooltip")       
+            .style("opacity", 0);
 
-//load college major data
-var d = d3.entries(data);
+        //load college major data
+        var d = d3.entries(data);
 
-/*
-[{"key": "chillers@fileopen.com", "value": "8"},
+            /*
+            [{"key": "chillers@fileopen.com", "value": "8"},
             {"key": "mike@fileopen.com", "value": "1"},
             {"key": "tom@fileopen.com", "value": "2"},
             {"key": "kim@fileopen.com", "value": "3"},
@@ -261,64 +261,65 @@ var d = d3.entries(data);
             {"key": "rock@fileopen.com", "value": "2"},
             {"key": "hitman@fileopen.com", "value": "1"}
             ];
-*/
+            */
 
-console.log(d);
+        console.log(d);
 
-  $this.nodes = d.map((d) => {
-    // scale radius to fit on the screen
-    var email = d.key,
-       scaledRadius = +d.value;
-       
-       var forcedCluster = email.replace(/.*@/, "");
+        $this.nodes = d.map((d) => {
+            // scale radius to fit on the screen
+            var email = d.key,
+            scaledRadius = +d.value;
+            //gets domain
+            var forcedCluster = email.replace(/.*@/, "");
+            
+            // add cluster id and radius to array
+            d = {
+                    cluster : forcedCluster,
+                    m       : email,
+                    r       : scaledRadius
+            };
+            // add to clusters array if it doesn't exist or the radius is larger than another radius in the cluster
+            if (!$this.clusters[forcedCluster] || (scaledRadius > $this.clusters[forcedCluster].r)) $this.clusters[forcedCluster] = d;
+            // if (!clusters[i] || (r > clusters[i].radius)) clusters[i] = d;
 
-    // add cluster id and radius to array
-    d = {
-      cluster : forcedCluster,
-      m     : email,
-      r     : scaledRadius
-    };
-    // add to clusters array if it doesn't exist or the radius is larger than another radius in the cluster
-    if (!$this.clusters[forcedCluster] || (scaledRadius > $this.clusters[forcedCluster].r)) $this.clusters[forcedCluster] = d;
-  //    if (!clusters[i] || (r > clusters[i].radius)) clusters[i] = d;
-
-    return d;
-  });
+            return d;
+        });
     
-    console.log($this.nodes);
+        console.log($this.nodes);
     
-    var tooltip = d3.select("body").append("div")
-                            .attr("class", "tooltip")
-                            .style("opacity", 0);
+        var tooltip = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
   
 
-  // append the circles to svg then style
-  // add functions for interaction
-  var circles = g.append('g')
-        .datum($this.nodes)
-      .selectAll('.circle')
-        .data(d => d)
-      .enter().append('circle')
-        .attr('r', (d) => d.r)
-        .attr('fill', (d) => z(d.cluster))
-        .attr('stroke-width', 1)
-        .on("mouseover", (d) => {
-                            tooltip.transition()
-                                .duration(200)
-                                .style("opacity", 0.9);
-                            tooltip.html( "<table>"
-                                         +"<tr><td align='left'>Group</td><td align='center'>:<td align='right'>" + d.cluster + "</td></tr>"
-                                         +"<tr><td align='left'>File Opened</td><td align='center'>:<td align='right'>" + d.r + "</td></tr>"
-                                         +"<tr><td align='left'>User Email</td><td align='center'>:<td align='right'>" + d.m + "</td></tr>"
-                                         + "</table>")
-                                .style("left", (d3.event.pageX + 5) + "px")
-                                .style("top", (d3.event.pageY - 28) + "px");
-                        })
-                        .on("mouseout", (d) => {
-                            tooltip.transition()
-                                .duration(500)
-                                .style("opacity", 0);
-                        });
+        // append the circles to svg then style
+        // add functions for interaction
+        var circles = g.append('g')
+            .datum($this.nodes)
+            .selectAll('.circle')
+            .data(d => d)
+            .enter()
+            .append('circle')
+            .attr('r', (d) => d.r)
+            .attr('fill', (d) => z(d.cluster))
+            .attr('stroke-width', 1)
+            .on("mouseover", (d) => {
+                tooltip.transition()
+                    .duration(200)
+                    .style("opacity", 0.9);
+                    tooltip.html( "<table>"
+                                    +"<tr><td align='left'>Group</td><td align='center'>:<td align='right'>" + d.cluster + "</td></tr>"
+                                    +"<tr><td align='left'>File Opened</td><td align='center'>:<td align='right'>" + d.r + "</td></tr>"
+                                    +"<tr><td align='left'>User Email</td><td align='center'>:<td align='right'>" + d.m + "</td></tr>"
+                                    + "</table>")
+                        .style("left", (d3.event.pageX + 5) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px");
+            })
+            .on("mouseout", (d) => {
+                tooltip.transition()
+                    .duration(500)
+                    .style("opacity", 0);
+            });
   
   
         circles.call(d3.drag()
@@ -326,12 +327,12 @@ console.log(d);
             .on("drag", dragged)
             .on("end", dragended));
     
-    var forceCollide = d3.forceCollide()
+        var forceCollide = d3.forceCollide()
             .radius(function(d) { return d.radius + 1.5; })
             .iterations(1);
 
-  // create the clustering/collision force simulation
-  $this.simulation = d3.forceSimulation()
+        // create the clustering/collision force simulation
+        $this.simulation = d3.forceSimulation()
             .nodes($this.nodes)
             .force("center", d3.forceCenter())
             .force("collide", forceCollide)
@@ -340,32 +341,32 @@ console.log(d);
             .force("x", d3.forceX().strength(0.2))
             .force("y", d3.forceY().strength(0.2))
             .on("tick", tick);
+            
+        function tick() {
+            circles
+            .attr('cx', (d) => d.x)
+            .attr('cy', (d) => d.y);
+        }
 
-  function tick() {
-      circles
-          .attr('cx', (d) => d.x)
-          .attr('cy', (d) => d.y);
-  }
-
-  // Drag functions used for interactivity
-  function dragstarted(d) {
-    if (!d3.event.active) $this.simulation.alphaTarget(0.3).restart();
-    d.fx = d.x;
-    d.fy = d.y;
-  }
-
-  function dragged(d) {
-    d.fx = d3.event.x;
-    d.fy = d3.event.y;
-  }
-
-  function dragended(d) {
-    if (!d3.event.active) $this.simulation.alphaTarget(0);
-    d.fx = null;
-    d.fy = null;
-  }
-        },
+        // Drag functions used for interactivity
+        function dragstarted(d) {
+            if (!d3.event.active) $this.simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
         
+        function dragged(d) {
+            d.fx = d3.event.x;
+            d.fy = d3.event.y;
+        }
+
+        function dragended(d) {
+            if (!d3.event.active) $this.simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+            }
+        },
+        //on click even to add cluster simulation
         add_sim: function (event) {
             let $this = this;
             if (event) {
@@ -374,41 +375,38 @@ console.log(d);
                 simulation.force("cluster", forceCluster);
                 simulation.alpha(1).restart();
                 
-            function forceCluster(alpha) {
-                for (var i = 0, n = $this.nodes.length, node, cluster, k = alpha * 1; i < n; ++i) {
-                    node = $this.nodes[i];
-                    cluster = $this.clusters[node.cluster];
-                    node.vx -= (node.x - cluster.x) * k;
-                    node.vy -= (node.y - cluster.y) * k;
+                function forceCluster(alpha) {
+                    for (var i = 0, n = $this.nodes.length, node, cluster, k = alpha * 1; i < n; ++i) {
+                        node = $this.nodes[i];
+                        cluster = $this.clusters[node.cluster];
+                        node.vx -= (node.x - cluster.x) * k;
+                        node.vy -= (node.y - cluster.y) * k;
+                    }
                 }
-            }
             }  
         
         },
         
         remove_sim: function (event) {
-        let $this = this;
-        console.log(event)
-        if (event) {
+            let $this = this;
             console.log(event)
-            var simulation = $this.simulation;
-            simulation.nodes($this.nodes);
-            simulation.force("cluster", forceCluster);
-            simulation.alpha(1).restart();
+            if (event) {
+                console.log(event)
+                var simulation = $this.simulation;
+                simulation.nodes($this.nodes);
+                simulation.force("cluster", forceCluster);
+                simulation.alpha(1).restart();
             
-            function forceCluster(alpha) {
-                for (var i = 0, n = $this.nodes.length, node, cluster, k = alpha * 0; i < n; ++i) {
-                    node = $this.nodes[i];
-                    cluster = $this.clusters[node.cluster];
-                    node.vx -= (node.x - cluster.x) * k;
-                    node.vy -= (node.y - cluster.y) * k;
+                function forceCluster(alpha) {
+                    for (var i = 0, n = $this.nodes.length, node, cluster, k = alpha * 0; i < n; ++i) {
+                        node = $this.nodes[i];
+                        cluster = $this.clusters[node.cluster];
+                        node.vx -= (node.x - cluster.x) * k;
+                        node.vy -= (node.y - cluster.y) * k;
+                    }
                 }
-            }            }  
+            }  
         }
-        
     }
-
-  }
-
-
+}
 </script>
