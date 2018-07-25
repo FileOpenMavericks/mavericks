@@ -3,7 +3,7 @@
     <v-layout row wrap>
         <v-card xs12 class="content content-center">
             <v-toolbar class="file-toolbar">
-                <v-text-field prepend-icon="search" v-model="searchTerm" hide-details single-line></v-text-field>
+
             </v-toolbar>
             <v-card-text>
                 <div id="heatChart-container" class="svg-container"></div>
