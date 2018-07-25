@@ -1,7 +1,7 @@
 module.exports = {
-    countData: function(data, category) {
-        // Split the category by . so that we can access children
-        var path = category.split('.');
+  countData: function (data, category) {
+    // Split the category by . so that we can access children
+    var path = category.split('.')
 
         //Make labelMap - associative array
         var labelMap = new Array();
@@ -12,7 +12,7 @@ module.exports = {
             for(let j = 1; j < path.length; j++){
                 key = key[path[j]];
             }
-            
+
             if(labelMap[key]){
                 ++labelMap[key];
             }else{

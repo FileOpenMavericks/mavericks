@@ -37,15 +37,17 @@ a {
 
 <script>
 export default {
-    name: 'dashboard',
-    data () {
-        return {
-            items: [
-                // { title: 'Link Open Location', route: 'demo', icon: 'room' },
-                { title: 'Link Open Times', route: 'none', icon: 'history' }
-            ],
-            right: null
-        }
+  name: 'dashboard',
+  data () {
+    return {
+      items: [
+        // { title: 'Link Open Location', route: 'demo', icon: 'room' },
+        { title: 'Link Open Times', route: '/document/' + this.$route.params.id + '/openbar', icon: 'history' },
+        {title: 'Link Open Locations', route: '/document/' + this.$route.params.id + '/opengoogle'}
+      ],
+      id: this.$route.params.id,
+      right: null
     }
+  }
 }
 </script>
