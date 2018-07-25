@@ -35,8 +35,8 @@ text.axis-worktime {
 </style>
 
 <script>
-import * as d3 from 'd3';
-import * as foPp from '../../../../FoNodeModules/FoPreprocessor';
+import * as d3 from 'd3'
+import * as foPp from '../../../../FoNodeModules/FoPreprocessor'
 
 export default {
     name: 'open-chart',
@@ -49,6 +49,7 @@ export default {
         }
     },
     mounted: function(){
+      console.log("mounted");
       this.getData();
     },
     created: function() {},
@@ -951,7 +952,7 @@ export default {
           		"hour": 24,
           		"value": 4
           	}
-          ]
+          ];
 
 
             // currently, we are using the above sample data set to test the features in the heat chart
@@ -1008,6 +1009,6 @@ export default {
           legend.exit().remove();
         });
   }
-},
+}
 }
 </script>
