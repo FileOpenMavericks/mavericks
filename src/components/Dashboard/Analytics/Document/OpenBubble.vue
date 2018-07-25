@@ -270,6 +270,7 @@ console.log(d);
     var email = d.key,
        scaledRadius = +d.value;
        
+       var forcedCluster = email.replace(/.*@/, "");
 
     // add cluster id and radius to array
     d = {
