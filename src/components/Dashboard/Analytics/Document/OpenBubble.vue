@@ -3,6 +3,8 @@
     <v-layout row wrap>
         <v-card xs12 class="content content-center">
             <v-toolbar class="file-toolbar">
+                <button v-on:click="add_sim">Group</button>
+                <button v-on:click="remove_sim">Reset</button>
             </v-toolbar>
             <v-card-text>
                 <div id="map-container" class="svg-container"></div>
@@ -65,7 +67,7 @@ body {
 }
 
 .tooltip {
-    width: 500px;
+    width: auto;
     height: auto;
     font: 14px sans-serif;
     font-weight: bold;
@@ -93,18 +95,22 @@ export default {
             searchTerm: '',
             data: [50, 90, 20, 100, 40, 50],
             linkData: null,
-            line: ''
+            line: '',
+            nodes: {},
+            simulation: {},
+            clusters: {}
+            
         }
     },
     mounted: function () {
-    this.getData()
+        this.getData()
   },
   created: function () {},
   methods: {
     getData () {
       let $this = this
-      let linkId = '426732708eee4929bd0ecbe9a4fc0b18'
-      $this.$http.get('https://pubtest.fileopen.com/api/analytics/link/' + linkId).then(response => {
+      let docRefId = '9c80af62b1094bdfab633019b2d10c1e'
+      $this.$http.get('https://pubtest.fileopen.com/api/analytics/file/' + docRefId).then(response => {
         $this.linkData = response.body
         // NOTE: Data is an array of entries, this prints the first entry
         console.log($this.linkData)
@@ -118,37 +124,22 @@ export default {
       })
     },
     renderOpenCountData(data){
-            var width = 860;
-            var height = 500;
-            var maxRadius = 6;
+    let $this = this;
+var margin = {top: 100, right: 100, bottom: 100, left: 100};
 
-            var n = 200;
-            var m = 10;
+var width = 960,
+    height = 500,
+    padding = 1.5, // separation between same-color circles
+    clusterPadding = 6, // separation between different-color circles
+    maxRadius = height*0.1;
 
-            var color = d3.scaleOrdinal(d3.schemeCategory10)
-                .domain(d3.range(m));
+var n = 200, // total number of nodes
+    m = 10, // number of distinct clusters
+    z = d3.scaleOrdinal(d3.schemeCategory10);
 
-            var clusters = new Array(m);
-
-            var data = d3.entries(data);
-        
-            console.log(data);
-            
-            var forceCollide = d3.forceCollide()
-            .radius(function(d) { return d.radius + 1.5; })
-            .iterations(1);
-
-            var force = d3.forceSimulation()
-                .nodes(data)
-                .force("center", d3.forceCenter())
-                .force("collide", forceCollide)
-                //.force("cluster", forceCluster)
-                .force("gravity", d3.forceManyBody(20))
-                .force("x", d3.forceX().strength(0.7))
-                .force("y", d3.forceY().strength(0.7))
-                .on("tick", tick);
-
-            var svg = d3.select("div#map-container")
+    $this.clusters = new Array(m);
+    
+    var svg = d3.select("div#map-container")
                 .append("svg")
                 .attr("width", width)
                 .attr("height", height)
@@ -159,138 +150,221 @@ export default {
                 .classed("svg-content", true)
                 .classed("svg-container", true);
 
-            var g = svg.append("g")
-                .attr("width", width)
-                .attr("height", height);
-                
-            g.append("rect")
-                .attr("x", width - 750)
-                .attr("y", height - 425)
-                .attr("width", 120)
-                .attr("height", 150)
-                .attr("fill", "lightgrey")
-                .style("stroke-size", "1px");
+    var g = svg.append("g")
+            .attr("width", width)
+            .attr("height", height);
+        
+        g.append("rect")
+            .attr("x", width - 750)
+            .attr("y", height - 425)
+            .attr("width", 120)
+            .attr("height", 150)
+            .attr("fill", "lightgrey")
+            .style("stroke-size", "1px");
 
-            g.append("circle")
-                .attr("r", 3)
-                .attr("cx", width - 660)
-                .attr("cy", height - 300)
-                .style("fill", "blue");
+        g.append("circle")
+            .attr("r", 3)
+            .attr("cx", width - 660)
+            .attr("cy", height - 300)
+            .style("fill", "blue");
 
-            g.append("circle")
-                .attr("r", 5)
-                .attr("cx", width - 660)
-                .attr("cy", height - 330)
-                .style("fill", "blue");
+        g.append("circle")
+            .attr("r", 5)
+            .attr("cx", width - 660)
+            .attr("cy", height - 330)
+            .style("fill", "blue");
 
-            g.append("circle")
-                .attr("r", 7)
-                .attr("cx", width - 660)
-                .attr("cy", height - 360)
-                .style("fill", "blue");
+        g.append("circle")
+            .attr("r", 7)
+            .attr("cx", width - 660)
+            .attr("cy", height - 360)
+            .style("fill", "blue");
+        
+        g.append("circle")
+            .attr("r", 9)
+            .attr("cx", width - 660)
+            .attr("cy", height - 390)
+            .style("fill", "blue");
 
-            g.append("circle")
-                .attr("r", 9)
-                .attr("cx", width - 660)
-                .attr("cy", height - 390)
-                .style("fill", "blue");
+        g.append("text")
+            .attr("class", "label")
+            .attr("x", width - 700)
+            .attr("y", height - 300)
+            .style("text-anchor", "end")
+            .text("Three");
 
-            g.append("text")
-                .attr("class", "label")
-                .attr("x", width - 700)
-                .attr("y", height - 300)
-                .style("text-anchor", "end")
-                .text("Three");
+        g.append("text")
+            .attr("class", "label")
+            .attr("x", width - 708)
+            .attr("y", height - 330)
+            .style("text-anchor", "end")
+            .text("Five");
 
-            g.append("text")
-                .attr("class", "label")
-                .attr("x", width - 708)
-                .attr("y", height - 330)
-                .style("text-anchor", "end")
-                .text("Five");
+        g.append("text")
+            .attr("class", "label")
+            .attr("x", width - 700)
+            .attr("y", height - 360)
+            .style("text-anchor", "end")
+            .text("Seven");
+        
+        g.append("text")
+            .attr("class", "label")
+            .attr("x", width - 708)
+            .attr("y", height - 390)
+            .style("text-anchor", "end")
+            .text("Nine");
+    
+           var zoom = d3.zoom()
+            .on("zoom",function() {
+                g.attr("transform", d3.event.transform);
+                g.selectAll(".node")
+            });
+        svg.call(zoom);
 
-            g.append("text")
-                .attr("class", "label")
-                .attr("x", width - 700)
-                .attr("y", height - 360)
-                .style("text-anchor", "end")
-                .text("Seven");
+// Define the div for the tooltip
+var div = d3.select("body").append("div") 
+    .attr("class", "tooltip")       
+    .style("opacity", 0);
 
-            g.append("text")
-                .attr("class", "label")
-                .attr("x", width - 708)
-                .attr("y", height - 390)
-                .style("text-anchor", "end")
-                .text("Nine");
-                
-            var zoom = d3.zoom()
-                .on("zoom",function() {
-                    g.attr("transform", d3.event.transform);
-                    g.selectAll(".node")
-                    });
-                    
-            svg.call(zoom);
-            
-            var tooltip = d3.select("div#map-container")
-                            .append("div")
+//load college major data
+var d = d3.entries(data);
+
+/*
+[{"key": "chillers@fileopen.com", "value": "8"},
+            {"key": "mike@fileopen.com", "value": "1"},
+            {"key": "tom@fileopen.com", "value": "2"},
+            {"key": "kim@fileopen.com", "value": "3"},
+            {"key": "chil@fileopen.com", "value": "6"},
+            {"key": "chiller@fileopen.com", "value": "1"},
+            {"key": "chang@fileopen.com", "value": "2"},
+            {"key": "ching@fileopen.com", "value": "4"},
+            {"key": "kong@fileopen.com", "value": "5"},
+            {"key": "king@fileopen.com", "value": "1"},
+            {"key": "sharad@fileopen.com", "value": "2"},
+            {"key": "tina@fileopen.com", "value": "3"},
+            {"key": "jerry@fileopen.com", "value": "6"},
+            {"key": "john@fileopen.com", "value": "5"},
+            {"key": "jim@fileopen.com", "value": "4"},
+            {"key": "hit@fileopen.com", "value": "4"},
+            {"key": "hot@fileopen.com", "value": "1"},
+            {"key": "cllers@fileopen.com", "value": "9"},
+            {"key": "cilers@fileopen.com", "value": "1"},
+            {"key": "chilers@fileopen.com", "value": "2"},
+            {"key": "chilles@fileopen.com", "value": "3"},
+            {"key": "chersy@fileopen.com", "value": "4"},
+            {"key": "chillers@fileopen.com", "value": "7"},
+            {"key": "cheery@fileopen.com", "value": "5"},
+            {"key": "game@fileopen.com", "value": "6"},
+            {"key": "show@fileopen.com", "value": "1"},
+            {"key": "grand@fileopen.com", "value": "2"},
+            {"key": "fox@fileopen.com", "value": "3"},
+            {"key": "rock@fileopen.com", "value": "2"},
+            {"key": "hitman@fileopen.com", "value": "1"}
+            ];
+*/
+
+console.log(d);
+
+  $this.nodes = d.map((d) => {
+    // scale radius to fit on the screen
+    var email = d.key,
+       scaledRadius = +d.value;
+       
+
+    // add cluster id and radius to array
+    d = {
+      cluster : forcedCluster,
+      m     : email,
+      r     : scaledRadius
+    };
+    // add to clusters array if it doesn't exist or the radius is larger than another radius in the cluster
+    if (!$this.clusters[forcedCluster] || (scaledRadius > $this.clusters[forcedCluster].r)) $this.clusters[forcedCluster] = d;
+  //    if (!clusters[i] || (r > clusters[i].radius)) clusters[i] = d;
+
+    return d;
+  });
+    
+    console.log($this.nodes);
+    
+    var tooltip = d3.select("body").append("div")
                             .attr("class", "tooltip")
                             .style("opacity", 0);
+  
 
-            var circle = g.selectAll("circles")
-                .data(data)
-                .enter()
-                .append("g")
-                .append("circle")
-                .attr("r", function(d) { return d.value; })
-                .style("fill", function(d) { return color(d.value); })
-                .on("mouseover", function (d) {
+  // append the circles to svg then style
+  // add functions for interaction
+  var circles = g.append('g')
+        .datum($this.nodes)
+      .selectAll('.circle')
+        .data(d => d)
+      .enter().append('circle')
+        .attr('r', (d) => d.r)
+        .attr('fill', (d) => z(d.cluster))
+        .attr('stroke-width', 1)
+        .on("mouseover", (d) => {
                             tooltip.transition()
                                 .duration(200)
                                 .style("opacity", 0.9);
                             tooltip.html( "<table>"
-                                         +"<tr><td align='left'>User</td><td align='center'>:<td align='right'>" + d.key + "</td></tr>"
-                                         +"<tr><td align='left'>Numbver of file open</td><td align='center'>:<td align='right'>" + d.value + "</td></tr>"
+                                         +"<tr><td align='left'>Group</td><td align='center'>:<td align='right'>" + d.cluster + "</td></tr>"
+                                         +"<tr><td align='left'>File Opened</td><td align='center'>:<td align='right'>" + d.r + "</td></tr>"
+                                         +"<tr><td align='left'>User Email</td><td align='center'>:<td align='right'>" + d.m + "</td></tr>"
                                          + "</table>")
-                                .style("left", (d3.event.pageX - 335) + "px")
-                                .style("top", (d3.event.pageY - 128) + "px");
+                                .style("left", (d3.event.pageX + 5) + "px")
+                                .style("top", (d3.event.pageY - 28) + "px");
                         })
-                        .on("mouseout", function (d) {
+                        .on("mouseout", (d) => {
                             tooltip.transition()
                                 .duration(500)
                                 .style("opacity", 0);
                         });
-                
-            function tick() {
-              circle
-                  .attr("cx", function(d) { return d.x; })
-                  .attr("cy", function(d) { return d.y; });
-            }
+  
+  
+        circles.call(d3.drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended));
+    
+    var forceCollide = d3.forceCollide()
+            .radius(function(d) { return d.radius + 1.5; })
+            .iterations(1);
 
-            circle.call(
-                d3.drag()
-                .on("start", dragstarted)
-                .on("drag", dragged)
-                .on("end", dragended));
+  // create the clustering/collision force simulation
+  $this.simulation = d3.forceSimulation()
+            .nodes($this.nodes)
+            .force("center", d3.forceCenter())
+            .force("collide", forceCollide)
+            //.force("cluster", forceCluster)
+            .force("gravity", d3.forceManyBody(0))
+            .force("x", d3.forceX().strength(0.2))
+            .force("y", d3.forceY().strength(0.2))
+            .on("tick", tick);
 
-            function dragstarted(d) {
-                d3.event.sourceEvent.stopPropagation();
-                if (!d3.event.active) force.alphaTarget(0.3).restart();
-                d.fx = d.x;
-                d.fy = d.y;
-                }
+  function tick() {
+      circles
+          .attr('cx', (d) => d.x)
+          .attr('cy', (d) => d.y);
+  }
 
-            function dragged(d) {
-                d.fx = d3.event.x;
-                d.fy = d3.event.y; 
-            }
+  // Drag functions used for interactivity
+  function dragstarted(d) {
+    if (!d3.event.active) $this.simulation.alphaTarget(0.3).restart();
+    d.fx = d.x;
+    d.fy = d.y;
+  }
 
-            function dragended(d) {
-                if (!d3.event.active) force.alphaTarget(0);
-                d.fx = null;
-                d.fy = null;
-            }
+  function dragged(d) {
+    d.fx = d3.event.x;
+    d.fy = d3.event.y;
+  }
 
+  function dragended(d) {
+    if (!d3.event.active) $this.simulation.alphaTarget(0);
+    d.fx = null;
+    d.fy = null;
+  }
         }
+        
     }
 }
 
