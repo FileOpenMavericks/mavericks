@@ -100,6 +100,7 @@ export default {
         console.log($this.docData)
         var output = foPp.countData(this.docData, 'user.email')
         console.log(output);
+        var output = d3.entries(output);
         $this.renderBarGraph(output, "Number of Opens per User");
 
         // NOTE: This is where I would call it calculate the data and create the graphic
@@ -167,7 +168,7 @@ export default {
             //This attribute applies a list of transformations to an element and sub-elments.
             //Tells the SVG Group Element, "g", to do a transformation where by it translates the element and sub-elements by 
             //moving to margin.left value from earlier code, margin.top value from earlier code.(topleft)
-        var data = d3.entries(data);
+        
         console.log(data);
 
         //The domain is used for data of space.
