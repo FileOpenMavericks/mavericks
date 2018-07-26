@@ -3,8 +3,10 @@
     <v-layout row wrap>
         <v-card xs12 class="content content-center">
             <v-toolbar class="file-toolbar">
-                <button v-on:click="add_sim">Group</button>
+                <div>
+                <button v-on:click="add_sim">Group By Email Domain</button>
                 <button v-on:click="remove_sim">Reset</button>
+                </div>
             </v-toolbar>
             <v-card-text>
                 <div id="map-container" class="svg-container"></div>
@@ -82,6 +84,27 @@ body {
     color:white;
 }
 
+button {
+    color:#08233e;
+    display:inline-block;
+    font:2.4em Futura, ‘Century Gothic’, AppleGothic, sans-serif;
+    font-size:11px;
+    padding: 10px 20px;
+    background-color:rgba(255,204,0,1);
+    border:1px solid #ffcc00;
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    -moz-box-shadow:inset 0 1px 0 rgba(255,255,255,0.5);
+    -webkit-box-shadow:inset 0 1px 0 rgba(255,255,255,0.5);
+    border-radius:10px;
+    border-bottom:1px solid #9f9f9f;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.5);
+    cursor:pointer;
+}
+button:hover {
+    background-color:rgba(255,204,0,0.8);
+}
+
 </style>
 
 <script>
@@ -153,66 +176,6 @@ export default {
         var g = svg.append("g")
             .attr("width", width)
             .attr("height", height);
-        
-        g.append("rect")
-            .attr("x", width - 750)
-            .attr("y", height - 425)
-            .attr("width", 120)
-            .attr("height", 150)
-            .attr("fill", "lightgrey")
-            .style("stroke-size", "1px");
-
-        g.append("circle")
-            .attr("r", 3)
-            .attr("cx", width - 660)
-            .attr("cy", height - 300)
-            .style("fill", "blue");
-
-        g.append("circle")
-            .attr("r", 5)
-            .attr("cx", width - 660)
-            .attr("cy", height - 330)
-            .style("fill", "blue");
-
-        g.append("circle")
-            .attr("r", 7)
-            .attr("cx", width - 660)
-            .attr("cy", height - 360)
-            .style("fill", "blue");
-        
-        g.append("circle")
-            .attr("r", 9)
-            .attr("cx", width - 660)
-            .attr("cy", height - 390)
-            .style("fill", "blue");
-
-        g.append("text")
-            .attr("class", "label")
-            .attr("x", width - 700)
-            .attr("y", height - 300)
-            .style("text-anchor", "end")
-            .text("Three");
-
-        g.append("text")
-            .attr("class", "label")
-            .attr("x", width - 708)
-            .attr("y", height - 330)
-            .style("text-anchor", "end")
-            .text("Five");
-
-        g.append("text")
-            .attr("class", "label")
-            .attr("x", width - 700)
-            .attr("y", height - 360)
-            .style("text-anchor", "end")
-            .text("Seven");
-        
-        g.append("text")
-            .attr("class", "label")
-            .attr("x", width - 708)
-            .attr("y", height - 390)
-            .style("text-anchor", "end")
-            .text("Nine");
     
         var zoom = d3.zoom()
             .on("zoom",function() {
@@ -290,6 +253,98 @@ export default {
         var tooltip = d3.select("body").append("div")
             .attr("class", "tooltip")
             .style("opacity", 0);
+            
+            
+        g.append("rect")
+            .attr("x", width - 750)
+            .attr("y", height - 415)
+            .attr("width", 120)
+            .attr("height", 170)
+            .attr("fill", "lightgrey")
+            .style("stroke-size", "1px");
+            
+        g.append("circle")
+            .attr("r", 3)
+            .attr("cx", width - 660)
+            .attr("cy", height - 275)
+            .style("fill", "blue")
+            .on("mouseover", (d) => {
+                tooltip.transition()
+                    .duration(200)
+                    .style("opacity", 0.9);
+                    tooltip.html( "<table>"
+                                    +"<tr><td align='left'>1. Size of circle is based on number of file opened by user</td></tr>"
+                                    +"<tr><td align='left'>2. Different color of circle shows different user</td></tr>"
+                                    +"<tr><td align='left'>3. Groups by domain of email</td></tr>"
+                                    + "</table>")
+                        .style("left", (d3.event.pageX + 5) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px");
+            })
+            .on("mouseout", (d) => {
+                tooltip.transition()
+                    .duration(500)
+                    .style("opacity", 0);
+            });
+            
+
+        g.append("circle")
+            .attr("r", 3)
+            .attr("cx", width - 660)
+            .attr("cy", height - 300)
+            .style("fill", "blue");
+
+        g.append("circle")
+            .attr("r", 5)
+            .attr("cx", width - 660)
+            .attr("cy", height - 330)
+            .style("fill", "blue");
+
+        g.append("circle")
+            .attr("r", 7)
+            .attr("cx", width - 660)
+            .attr("cy", height - 360)
+            .style("fill", "blue");
+        
+        g.append("circle")
+            .attr("r", 9)
+            .attr("cx", width - 660)
+            .attr("cy", height - 390)
+            .style("fill", "blue");
+            
+        g.append("text")
+            .attr("class", "label")
+            .attr("x", width - 700)
+            .attr("y", height - 270)
+            .style("text-anchor", "end")
+            .text("Hint:");
+
+        g.append("text")
+            .attr("class", "label")
+            .attr("x", width - 700)
+            .attr("y", height - 300)
+            .style("text-anchor", "end")
+            .text("Three");
+
+        g.append("text")
+            .attr("class", "label")
+            .attr("x", width - 708)
+            .attr("y", height - 330)
+            .style("text-anchor", "end")
+            .text("Five");
+
+        g.append("text")
+            .attr("class", "label")
+            .attr("x", width - 700)
+            .attr("y", height - 360)
+            .style("text-anchor", "end")
+            .text("Seven");
+        
+        g.append("text")
+            .attr("class", "label")
+            .attr("x", width - 708)
+            .attr("y", height - 390)
+            .style("text-anchor", "end")
+            .text("Nine");
   
 
         // append the circles to svg then style
