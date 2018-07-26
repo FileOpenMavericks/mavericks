@@ -134,6 +134,39 @@ export default {
         console.log($this.docData)
         var output = foPp.countData(this.docData, 'user.email')
         console.log(output)
+
+        
+
+        // $this.docData.forEach(function(d){
+        //   d.session.opened.date = new Date(d.session.opened.date);
+        //   d.session.opened.date  = dateFormat(d.session.opened.date);
+        // });
+
+        // //Test function
+        // var dateFormat = d3.timeFormat("%x");
+        // var dateParse = d3.timeParse(dateFormat);
+
+        // var countedMonthDay = d3.nest()
+        //                       .key(function(d){ 
+        //                         d.session.opened.date = new Date(d.session.opened.date);
+        //                         d.session.opened.date  = dateFormat(d.session.opened.date);
+        //                         return d.session.opened.date; })
+        //                       .rollup(function(v){
+        //                         return {
+        //                         count: v.length
+        //                       }})
+        //                       .entries($this.docData);
+        // countedMonthDay.forEach(function(d){
+        //   let dateObj = dateParse(d.key);
+        //   d.month = dateObj.getMonth();
+        //   d.day = dateObj.getDay();
+        // });
+        
+        // console.log("counted month, day");
+        // console.log(countedMonthDay);
+
+        console.log($this.docData);
+
         $this.renderData($this.docData, null)
 
         // NOTE: This is where I would call it calculate the data and create the graphic
@@ -156,7 +189,6 @@ export default {
       var tooltip = $this.makeToolTip()
       // Add the container when the overlay is added to the map.
       $this.overlay.onAdd = function () {
-        console.log('Adding overlay')
         var layer = d3.select(this.getPanes().overlayMouseTarget).append('div')
           .attr('class', 'stations')
 
@@ -164,11 +196,8 @@ export default {
         // We could use a single SVG, but what size would it have?
         $this.overlay.draw = function () {
           data = $this.filterData($this.docData)
-          console.log('drawing markers')
           var projection = this.getProjection(),
             padding = 10
-          console.log('Data:')
-          console.log(data)
           // Reset
           layer.selectAll('svg').remove()
 
@@ -179,8 +208,6 @@ export default {
             .each(transform)
             .attr('class', 'marker')
             .on('mouseover', function (d) {
-              console.log('Mousing over')
-              console.log(tooltip)
               tooltip.transition()
                 .duration(200)
                 .style('opacity', 0.9)
@@ -210,8 +237,6 @@ export default {
             .text(function (d) { return d.key })
 
           function transform (d) {
-            console.log('D:')
-            console.log(d)
             d.lat = 0
             if (d.location.lat) {
               d.lat = parseFloat(d.location.lat)
@@ -220,8 +245,6 @@ export default {
             if (d.location.lon) {
               d.lon = parseFloat(d.location.lon)
             }
-            console.log('Transformed d')
-            console.log(d)
             d = new google.maps.LatLng(d.lat, d.lon)
             d = projection.fromLatLngToDivPixel(d)
             return d3.select(this)
@@ -245,7 +268,6 @@ export default {
       var filteredData = new Array()
       data.forEach(function (d) {
         if ($this.sessionInFilter(d)) {
-          console.log('match')
           filteredData.push(d)
         }
       })
@@ -254,12 +276,10 @@ export default {
     sessionInFilter (session) {
       let $this = this
       let searchTerm = $this.searchVal.toLowerCase()
-      console.log('Filtering...')
       if (session.user.first.toLowerCase().includes(searchTerm) ||
                 session.user.last.toLowerCase().includes(searchTerm) ||
                 session.user.email.toLowerCase().includes(searchTerm)
       ) {
-        console.log('match')
         return true
       }
       return false
