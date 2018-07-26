@@ -129,14 +129,13 @@ export default {
               .style("text-anchor", "middle")
               .attr("transform", "translate(" + gridSize / 2 + ", -6)")
               .attr("class", function(d, i) { return ((i >= 7 && i <= 16) ? "monthLabel mono axis axis-worktime" : "timeLabel mono axis"); });
-          // function that grabs month and day
-
 
             // currently, we are using the above sample data set to test the features in the heat chart
             // with the forEach() function
            sessionData.forEach(function(element){
           var colorScale = d3.scaleQuantile()
-              .domain([0,buckets - 1, d3.max(sessionData, function (d) { return d.value; })])
+              .domain([0,buckets, d3.max(sessionData, function (d) { return d.value.counts; })])
+              //.domain([0,buckets,9])
               .range(colors);
 
           //this is where we build the datetime function after using the parsing function
@@ -157,11 +156,10 @@ export default {
                 .style("fill", colors[0]);
 
           cards.transition().duration(1000)
-                .style("fill", function(d) { return colorScale(d.value); });
+                .style("fill", function(d) {
+                  return colorScale(d.value.count); });
 
           cards.select("title").text(function (d){
-            console.log("title");
-            console.log(d.value.count);
             return d.value.count; });
 
           cards.exit().remove();
