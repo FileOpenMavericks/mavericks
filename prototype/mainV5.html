@@ -32,7 +32,6 @@
                 left: 0;
             }
 
-
             .tooltip {
                 width: 500px;
                 height: auto;
@@ -357,14 +356,7 @@
             var tooltip = d3.select("body").append("div")
                 .attr("class", "tooltip")
                 .style("opacity", 0);
-
-            // d3.json('tectonics.json').then(function (data) {
-            //     g.insert("path")
-            //         .datum(topojson.mesh(data, data.objects.tec))
-            //         .attr("class", "tectonic")
-            //         .attr("d", path);
-            // });
-
+            
             //Country tooltip and list
             var countryTooltip = d3.select("body").append("div").attr("class", "countryTooltip");
 
