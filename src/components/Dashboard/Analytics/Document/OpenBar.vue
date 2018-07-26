@@ -124,23 +124,7 @@ export default {
       
 
 
-        // Define X and Y SCALE.
-        //The range is used for visual space.
-        var xScale = d3.scaleBand()
-            //(d3.scale.ordinal) has discrete data set.
-            .rangeRound([0, $this.graphWidth])
-            .padding(0.1);
-            // (.rangeRoundBands) specifies the range that those values will cover and makes the bars clean and spaced properly.
-            //The range is specified as being from 0 to the width of the graphing area. 
-            //It make starting point from 0 and end at the end of graph.
-            //After 0.1 is specified for padding of 0.1 to create space.
-        var yScale = d3.scaleLinear()
-            //d3.scale.linear() has comparative numbers
-            .range([$this.graphHeight, 0]);
-            //(.range) specifies the range that those values will cover.
-            //The range is specified as being from the height of the graphing area to 0. 
-            //It make starting point from the height of the graphing area to 0.
-
+        
 
 
 
@@ -148,9 +132,9 @@ export default {
 
             //Variable is created known as the dollar_sign with value $
 
-        var xAxis = d3.axisBottom(xScale);
+        var xAxis = d3.axisBottom($this.xScale);
 
-        var yAxis = d3.axisLeft(yScale)
+        var yAxis = d3.axisLeft($this.yScale)
             .ticks(5)
 
         // Define SVG. "g" means group SVG elements together.
@@ -174,17 +158,17 @@ export default {
 
         //The domain is used for data of space.
         //Lets D3 know what the scope of data will it have and they are then passed to the scale function.
-        xScale.domain(data.map(function (d) { return d.key; }));
+        $this.xScale.domain(data.map(function (d) { return d.key; }));
         //(function(d) { return d.key; }) returns all the 'key' values in 'data'. This is then passed to the scale function.
         //(.map) function that finds the maximum and minimum values in the array and then passed to the scale function.
         //The (.domain) function which returns those maximum and minimum values to D3 as the range for the x axis.
-        yScale.domain([0, d3.max(data, function (d) {return d.value; })]);
+        $this.yScale.domain([0, d3.max(data, function (d) {return d.value; })]);
         //Tells y axis goes from 0 to the maximum in the data range.
         //0 is the starting point.
 
 
         console.log("X bandwidth");
-        console.log(xScale.bandwidth());
+        console.log($this.xScale.bandwidth());
         // Creating rectangular bars to represent the data. 
         // you can create circle or anytype of shape you want here.
 
@@ -197,13 +181,13 @@ export default {
             .append("rect")
             .attr("height", 0)
             .attr("y", $this.graphHeight)
-            .attr("x", function (d) {return xScale(d.key)})
+            .attr("x", function (d) {return $this.xScale(d.key)})
             .transition()
             .duration(1000)
             .ease(d3.easeQuad)
-            .attr("width", xScale.bandwidth())
-            .attr("height", function (d) {return $this.graphHeight - yScale(d.value)})
-            .attr("y", function (d){ return yScale(d.value)})
+            .attr("width", $this.xScale.bandwidth())
+            .attr("height", function (d) {return $this.graphHeight - $this.yScale(d.value)})
+            .attr("y", function (d){ return $this.yScale(d.value)})
             .attr("fill", function (d, i) { return "rgb(255, 105, " + (i * 20) + ")";});
 
         svg.selectAll("text")
@@ -214,10 +198,10 @@ export default {
                 return d.value;
             })
             .attr("x", function (d) {
-                return xScale(d.key);
+                return $this.xScale(d.key);
             })
             .attr("y", function (d) {
-                return yScale(d.value);
+                return $this.yScale(d.value);
             })
             .attr("font-size", "11px")
             .attr("fill", "White")
@@ -313,6 +297,24 @@ export default {
         //Sets weidth of graphing area.
         $this.graphHeight = 500 - $this.graphMargin.top - $this.graphMargin.bottom;
         //Sets height of graphing area.
+        
+        // Define X and Y SCALE.
+        //The range is used for visual space.
+        $this.xScale = d3.scaleBand()
+            //(d3.scale.ordinal) has discrete data set.
+            .rangeRound([0, $this.graphWidth])
+            .padding(0.1);
+            // (.rangeRoundBands) specifies the range that those values will cover and makes the bars clean and spaced properly.
+            //The range is specified as being from 0 to the width of the graphing area. 
+            //It make starting point from 0 and end at the end of graph.
+            //After 0.1 is specified for padding of 0.1 to create space.
+        $this.yScale = d3.scaleLinear()
+            //d3.scale.linear() has comparative numbers
+            .range([$this.graphHeight, 0]);
+            //(.range) specifies the range that those values will cover.
+            //The range is specified as being from the height of the graphing area to 0. 
+            //It make starting point from the height of the graphing area to 0.
+
     }
   }
 }
