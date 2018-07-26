@@ -56,7 +56,8 @@ export default {
       getData() {
           let $this = this;
         //  let linkId = '426732708eee4929bd0ecbe9a4fc0b18'
-          let docRefId = '52f2468e05f743ca9911abe07c196363'
+        //  let docRefId = '52f2468e05f743ca9911abe07c196363'
+        let docRefId = $this.$route.params.id;
           $this.$http.get('https://pubtest.fileopen.com/api/analytics/file/' + docRefId).then(response => {
               $this.docData = response.body;
               // NOTE: Data is an array of entries, this prints the first entry
