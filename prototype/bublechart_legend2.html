@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>bubble chart</title>
+<style>
+    .tooltip {
+        width: auto;
+        height: auto;
+        font: 14px sans-serif;
+        font-weight: bold;
+        border-radius: 5px;
+        padding: 3px 3px 3px 3px;
+        position:absolute;			
+        background: SeaGreen;	
+        border: solid black 2px;
+        border-radius: 8px;			
+        pointer-events: none;
+        margin-left: 15px;
+        color:white;
+    }
+</style>
+<body>
+    <script src="https://d3js.org/d3.v5.js"></script>
+    <button class= "button" onclick="hideItem()">Group</button>
+    <button class= "button" onclick="showItem()">Reset</button>
+    <div id="map-container" class="svg-container"></div>
+    <script>
+        var width = 960;
+        var height = 500;
+        var maxRadius = 12;
+        var n = 200;
+        var m = 10;
+        var color = d3.scaleOrdinal(d3.schemeCategory10)
+            .domain(d3.range(m));
+        var clusters = new Array(m);
+        var nodes = d3.range(n).map(function() {
+            var text = "";
+            var possible = "AB";
+            //CDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            for (var i = 0; i < 5; i++){
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+            }
+            var i = Math.floor(Math.random() * m);
+            var j = text + "@" + text;
+            var o = j.replace(/.*@/, "");
+            var r = Math.sqrt((i + 1) / m * -Math.log(Math.random())) * maxRadius;
+            var d = {cluster: o, radius: r, email: j};
+            if (!clusters[o] || (r > clusters[o].radius)) clusters[o] = d;
+            return d;
+        });
+        
+        console.log(nodes);
+        var forceCollide = d3.forceCollide()
+            .radius(function(d) { return d.radius + 1.5; })
+            .iterations(1);
+        var force = d3.forceSimulation()
+            .nodes(nodes)
+            .force("center", d3.forceCenter())
+            .force("collide", forceCollide)
+           // .force("cluster", forceCluster)
+            .force("gravity", d3.forceManyBody(0))
+            .force("x", d3.forceX().strength(0.2))
+            .force("y", d3.forceY().strength(0.2))
+            .on("tick", tick);
+        var svg = d3.select("div#map-container")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .append("g")
+                .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')')
+                .attr("preserveAspectRatio", "xMinYMin meet")
+                .attr("viewBox", "0 0 300 300")
+                .classed("svg-content", true)
+                .classed("svg-container", true);
+        var g = svg.append("g")
+            .attr("width", width)
+            .attr("height", height);
+        
+        let min = nodes[0].radius, max = nodes[0].radius;
+            for (let i = 1, len=nodes.length; i < len; i++) {
+                let v = nodes[i].radius;
+                min = (v < min) ? v : min;
+                max = (v > max) ? v : max;
+            }
+        
+            console.log(min);
+            console.log(max);
+        
+        g.append("rect")
+            .attr("x", width - 750)
+            .attr("y", height - 415)
+            .attr("width", 120)
+            .attr("height", 170)
+            .attr("fill", "lightgrey")
+            .style("stroke-size", "1px");
+            
+        g.append("circle")
+            .attr("r", 3)
+            .attr("cx", width - 660)
+            .attr("cy", height - 275)
+            .style("fill", "red")
+            .on("mouseover", function (d) {
+                tooltip.transition()
+                    .duration(200)
+                    .style("opacity", 0.9);
+                    tooltip.html( "<table>"
+                                    +"<tr><td align='left'>1. Size of circle is based on number of file opened by user</td></tr>"
+                                    +"<tr><td align='left'>2. Different color of circle shows different user</td></tr>"
+                                    +"<tr><td align='left'>3. Groups by domain of email</td></tr>"
+                                    + "</table>")
+                        .style("left", (d3.event.pageX + 5) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px");
+            })
+            .on("mouseout", function (d) {
+                tooltip.transition()
+                    .duration(500)
+                    .style("opacity", 0);
+            });
+            
+
+        g.append("circle")
+            .attr("r", function(d) { return Math.round(max/6); })
+            .attr("cx", width - 660)
+            .attr("cy", height - 300)
+            .attr("stroke-width", 2)
+            .attr("stroke", "black")
+            .style("fill", "blue")
+            .style('opacity', 0.5);
+
+        g.append("circle")
+            .attr("r", function(d) { return Math.round(max/4); })
+            .attr("cx", width - 660)
+            .attr("cy", height - 330)
+            .attr("stroke-width", 2)
+            .attr("stroke", "black")
+            .style("fill", "blue")
+            .style('opacity', 0.5);
+
+        g.append("circle")
+            .attr("r", function(d) { return Math.round(max/2); })
+            .attr("cx", width - 660)
+            .attr("cy", height - 360)
+            .attr("stroke-width", 2)
+            .attr("stroke", "black")
+            .style("fill", "blue")
+            .style('opacity', 0.5);
+        
+        g.append("circle")
+            .attr("r", function(d) { return Math.round(max); })
+            .attr("cx", width - 660)
+            .attr("cy", height - 390)
+            .attr("stroke-width", 2)
+            .attr("stroke", "black")
+            .style("fill", "blue")
+            .style('opacity', 0.5);
+            
+        g.append("text")
+            .attr("class", "label")
+            .attr("x", width - 700)
+            .attr("y", height - 270)
+            .style("text-anchor", "end")
+            .style("text-decoration", "underline")
+            .text("Hint:");
+
+        g.append("text")
+            .attr("class", "label")
+            .attr("x", width - 700)
+            .attr("y", height - 295)
+            .style("text-anchor", "end")
+            .text(Math.round(max/6));
+
+        g.append("text")
+            .attr("class", "label")
+            .attr("x", width - 700)
+            .attr("y", height - 325)
+            .style("text-anchor", "end")
+            .text(Math.round(max/4));
+
+        g.append("text")
+            .attr("class", "label")
+            .attr("x", width - 700)
+            .attr("y", height - 355)
+            .style("text-anchor", "end")
+            .text(Math.round(max/2));
+        
+        g.append("text")
+            .attr("class", "label")
+            .attr("x", width - 700)
+            .attr("y", height - 390)
+            .style("text-anchor", "end")
+            .text(Math.round(max));
+        
+            // zoom and pan
+        var zoom = d3.zoom()
+            .on("zoom",function() {
+                g.attr("transform", d3.event.transform);
+                g.selectAll(".node")
+            });
+        svg.call(zoom);
+        
+        var tooltip = d3.select("body").append("div")
+                            .attr("class", "tooltip")
+                            .style("opacity", 0);
+        
+        var circle = g.selectAll("circle")
+            .data(nodes)
+            .enter()
+            .append("circle")
+            .attr("r", function(d) { return d.radius; })
+            .style("fill", function(d) { return color(d.email); })
+            .on("mouseover", function (d) {
+                            tooltip.transition()
+                                .duration(200)
+                                .style("opacity", 0.9);
+                            tooltip.html( "<table>"
+                                         +"<tr><td align='left'>Email</td><td align='center'>:<td align='right'>" + d.email + "</td></tr>"
+                                         +"<tr><td align='left'>Radius</td><td align='center'>:<td align='right'>" + d.radius + "</td></tr>"
+                                         + "</table>")
+                                .style("left", (d3.event.pageX + 5) + "px")
+                                .style("top", (d3.event.pageY - 28) + "px");
+                        })
+                        .on("mouseout", function (d) {
+                            tooltip.transition()
+                                .duration(500)
+                                .style("opacity", 0);
+                        });
+        function tick() {
+          circle
+              .attr("cx", function(d) { return d.x; })
+              .attr("cy", function(d) { return d.y; });
+        }
+        circle.call(
+            d3.drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended));
+        
+        function dragstarted(d) {
+            d3.event.sourceEvent.stopPropagation();
+            if (!d3.event.active) force.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+        function dragged(d) {
+              d3.select(this)
+                  .attr("cx", d.fx = d3.event.x)
+                  .attr("cy", d.fy = d3.event.y);
+        }
+        function dragended(d) {
+            if (!d3.event.active) force.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        }
+        
+        function hideItem(){
+            force.nodes(nodes);
+            force.force("cluster", forceCluster);
+            force.alpha(1).restart();
+            
+            function forceCluster(alpha) {
+                for (var i = 0, n = nodes.length, node, cluster, k = alpha * 1; i < n; ++i) {
+                    node = nodes[i];
+                    cluster = clusters[node.cluster];
+                    node.vx -= (node.x - cluster.x) * k;
+                    node.vy -= (node.y - cluster.y) * k;
+                }
+            }
+        }
+        
+        function showItem(){  
+            force.nodes(nodes);
+            force.force("cluster", forceCluster);
+            force.alpha(1).restart();
+            
+            function forceCluster(alpha) {
+                for (var i = 0, n = nodes.length, node, cluster, k = alpha * 0; i < n; ++i) {
+                    node = nodes[i];
+                    cluster = clusters[node.cluster];
+                    node.vx -= (node.x - cluster.x) * k;
+                    node.vy -= (node.y - cluster.y) * k;
+                }
+            }
+        }  
+    </script>
