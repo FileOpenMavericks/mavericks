@@ -159,7 +159,10 @@ export default {
           cards.transition().duration(1000)
                 .style("fill", function(d) { return colorScale(d.value); });
 
-          cards.select("title").text(function (d){ return d.value; });
+          cards.select("title").text(function (d){
+            console.log("title");
+            console.log(d.value.count);
+            return d.value.count; });
 
           cards.exit().remove();
 
