@@ -8,9 +8,7 @@ Mavericks
 
 
 ## Team Members
-|                    |                   |                        |
 |--------------------|-------------------|------------------------|
-|Casey Hillers       | Product Owner     | chillers@fileopen.com  |
 |Nicholas Kalscheuer | Scrum Master - S3 | nkalsche@ucsc.edu      |
 |Randall Li          | Scrum Master - S2 | rhli@ucsc.edu          |
 |Ciara Fitzpatrick   | Scrum Master - S1 | ccfitzpa@ucsc.edu      |
@@ -29,9 +27,12 @@ Mavericks
 * CSS
 * JavaScript
 
-### Frameworks
+### Frameworks/Libraries/APIs
 * D3
 * TopoJSON
+* D3
+* Vuetify
+* Google Maps API
 
 ## Get Started
 
@@ -47,23 +48,26 @@ Mavericks
 3. Run the application.
 `yarn run dev`
 
-### Nginx Site
+## File overview
 
-This will create a site under `localhost` with the project located at `/var/www/html/mavericks/`.
+FoNodeModules directory:
+* FoPreprocessor.js (This is a modular function that was used for collecting number of opens per user.)
 
-`/etc/nginx/sites-enable/default`
-```
-location / {
-    root /var/www/html/mavericks/dist/;
-    index index.html;
+router directory:
+* index.js
+* routes.js (Routes page that directs any individual to the analytics)
 
-    if (-f $request_filename) {
-        break;
-    }
+Analytics directory:
+* Dashboard.vue
+* DashboardDemo.vue (The static default page there is nothing loaded on the page.)
 
-    rewrite (.+)$ /index.html break;
-}
-```
+Document directory:
+* OpenBar.vue
+* OpenBubble.vue
+* OpenChart.vue
+* OpenGoogle.vue
+
+
 
 ## Resources
 
