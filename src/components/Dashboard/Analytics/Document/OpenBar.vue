@@ -84,10 +84,17 @@ export default {
       docData: null,
       openCount: null,
       averagOpenTime: null,
-      line: ''
+      line: '',
+      graphMargin: null,
+      graphWidth: 0,
+      graphHeight: 0,
+      graphSvg: null,
+      xScale: null,
+      yScale: null
     }
   },
   mounted: function () {
+    this.initializeGraph();
     this.getData()
   },
   created: function () {},
@@ -101,6 +108,7 @@ export default {
         var output = foPp.countData(this.docData, 'user.email')
         console.log(output);
         var output = d3.entries(output);
+        
         $this.renderBarGraph(output, "Number of Opens per User");
 
         // NOTE: This is where I would call it calculate the data and create the graphic
@@ -110,24 +118,17 @@ export default {
       })
     },
     renderBarGraph(data, yAxisLabel){
+        let $this = this;
       //counts the entries by email
 
-      //Now render data
-      var margin = {top: 60, right: 20, bottom: 200, left: 50},
-        //Sets margin for graphing area.
-        //Margin generates space around elements. 
-        //Each side of the element can be customizable by using top, right, bottom, and left. 
-        width = 760 - margin.left - margin.right,
-        //Sets weidth of graphing area.
-        height = 500 - margin.top - margin.bottom;
-        //Sets height of graphing area.
+      
 
 
         // Define X and Y SCALE.
         //The range is used for visual space.
         var xScale = d3.scaleBand()
             //(d3.scale.ordinal) has discrete data set.
-            .rangeRound([0, width])
+            .rangeRound([0, $this.graphWidth])
             .padding(0.1);
             // (.rangeRoundBands) specifies the range that those values will cover and makes the bars clean and spaced properly.
             //The range is specified as being from 0 to the width of the graphing area. 
@@ -135,7 +136,7 @@ export default {
             //After 0.1 is specified for padding of 0.1 to create space.
         var yScale = d3.scaleLinear()
             //d3.scale.linear() has comparative numbers
-            .range([height, 0]);
+            .range([$this.graphHeight, 0]);
             //(.range) specifies the range that those values will cover.
             //The range is specified as being from the height of the graphing area to 0. 
             //It make starting point from the height of the graphing area to 0.
@@ -158,16 +159,16 @@ export default {
         var svg = d3.select("#barchart-container").append("svg")
             //Creates svg variable.
             //It will find the body and append a new svg element just before the closing the body.
-            .attr("width", width + margin.left + margin.right)
+            .attr("width", $this.graphWidth + $this.graphMargin.left + $this.graphMargin.right)
             //Width is refrenced from earlier code located at var margin.
-            .attr("height", height + margin.top + margin.bottom)
+            .attr("height", $this.graphHeight + $this.graphMargin.top + $this.graphMargin.bottom)
             //Height is refrenced from earlier code located at var margin.
             .append("g")
             //Groups svg element together.
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            .attr("transform", "translate(" + $this.graphMargin.left + "," + $this.graphMargin.top + ")");
             //This attribute applies a list of transformations to an element and sub-elments.
             //Tells the SVG Group Element, "g", to do a transformation where by it translates the element and sub-elements by 
-            //moving to margin.left value from earlier code, margin.top value from earlier code.(topleft)
+            //moving to $this.graphMargin.left value from earlier code, margin.top value from earlier code.(topleft)
         
         console.log(data);
 
@@ -188,7 +189,6 @@ export default {
         // you can create circle or anytype of shape you want here.
 
         //selection of rectangles and creates rectangles
-        console.log(height);
         svg.selectAll("rect")
             .data(data)
             //Allows us to attach data of any type
@@ -196,13 +196,13 @@ export default {
             //Allows us to bind the data to the empty selection
             .append("rect")
             .attr("height", 0)
-            .attr("y", height)
+            .attr("y", $this.graphHeight)
             .attr("x", function (d) {return xScale(d.key)})
             .transition()
             .duration(1000)
             .ease(d3.easeQuad)
             .attr("width", xScale.bandwidth())
-            .attr("height", function (d) {return height - yScale(d.value)})
+            .attr("height", function (d) {return $this.graphHeight - yScale(d.value)})
             .attr("y", function (d){ return yScale(d.value)})
             .attr("fill", function (d, i) { return "rgb(255, 105, " + (i * 20) + ")";});
 
@@ -230,7 +230,7 @@ export default {
         // Draw xAxis and position the label at -60 degrees as shown on the output
         svg.append("g")
             .attr("class", "x axis")
-            .attr("transform", "translate(0," + (height + 0.1) + ")")
+            .attr("transform", "translate(0," + ($this.graphHeight + 0.1) + ")")
             .call(xAxis)
             .selectAll("text")
             //Selects all text in x axis.
@@ -248,7 +248,7 @@ export default {
         // Draw yAxis and postion the label
         svg.append("g")
             .attr("class", "y axis")
-            .attr("transform", "translate(0," + (width - 690) + ")")
+            .attr("transform", "translate(0," + ($this.graphWidth - 690) + ")")
             .call(yAxis)
             .selectAll("text")
             //Selects all text element.
@@ -263,7 +263,7 @@ export default {
         svg.append("text")
             .attr("text-anchor", "middle")
             //This makes it easy to centre the text as the transform is applied to the anchor.
-            .attr("transform", "translate(0," + (width - 450) + ")rotate(-90)")
+            .attr("transform", "translate(0," + ($this.graphWidth - 450) + ")rotate(-90)")
             //Text is drawn off the screen top left, move down and out and rotate.
             .attr("dx", "2em")
             //Moves text vertically.
@@ -301,6 +301,18 @@ export default {
     renderOpenCount(){
         let $this = this;
         console.log("Render open count bar");
+    },
+    initializeGraph(){
+        let $this = this;
+        //Now render data
+        $this.graphMargin = {top: 60, right: 20, bottom: 200, left: 50};
+        //Sets margin for graphing area.
+        //Margin generates space around elements. 
+        //Each side of the element can be customizable by using top, right, bottom, and left. 
+        $this.graphWidth = 760 - $this.graphMargin.left - $this.graphMargin.right,
+        //Sets weidth of graphing area.
+        $this.graphHeight = 500 - $this.graphMargin.top - $this.graphMargin.bottom;
+        //Sets height of graphing area.
     }
   }
 }
