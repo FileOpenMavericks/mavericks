@@ -17,6 +17,26 @@
         margin-left: 15px;
         color:white;
     }
+    button {
+        color:#08233e;
+        display:inline-block;
+        font:2.4em Futura, ‘Century Gothic’, AppleGothic, sans-serif;
+        font-size:11px;
+        padding: 10px 20px;
+        background-color:rgba(255,204,0,1);
+        border:1px solid #ffcc00;
+        -moz-border-radius:10px;
+        -webkit-border-radius:10px;
+        -moz-box-shadow:inset 0 1px 0 rgba(255,255,255,0.5);
+        -webkit-box-shadow:inset 0 1px 0 rgba(255,255,255,0.5);
+        border-radius:10px;
+        border-bottom:1px solid #9f9f9f;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,0.5);
+        cursor:pointer;
+    }
+    button:hover {
+        background-color:rgba(255,204,0,0.8);
+    }
 </style>
 <body>
     <script src="https://d3js.org/d3.v5.js"></script>
@@ -104,8 +124,7 @@
                     .style("opacity", 0.9);
                     tooltip.html( "<table>"
                                     +"<tr><td align='left'>1. Size of circle is based on number of file opened by user</td></tr>"
-                                    +"<tr><td align='left'>2. Different color of circle shows different user</td></tr>"
-                                    +"<tr><td align='left'>3. Groups by domain of email</td></tr>"
+                                    +"<tr><td align='left'>2. Groups by domain of email</td></tr>"
                                     + "</table>")
                         .style("left", (d3.event.pageX + 5) + "px")
                         .style("top", (d3.event.pageY - 28) + "px");
@@ -205,7 +224,7 @@
             .data(nodes)
             .enter()
             .append("circle")
-            .attr("r", function(d) { return d.radius; })
+            .attr("r", function(d) { return Math.round(d.radius); })
             .style("fill", function(d) { return color(d.email); })
             .on("mouseover", function (d) {
                             tooltip.transition()
@@ -213,7 +232,7 @@
                                 .style("opacity", 0.9);
                             tooltip.html( "<table>"
                                          +"<tr><td align='left'>Email</td><td align='center'>:<td align='right'>" + d.email + "</td></tr>"
-                                         +"<tr><td align='left'>Radius</td><td align='center'>:<td align='right'>" + d.radius + "</td></tr>"
+                                         +"<tr><td align='left'>Radius</td><td align='center'>:<td align='right'>" + Math.round(d.radius) + "</td></tr>"
                                          + "</table>")
                                 .style("left", (d3.event.pageX + 5) + "px")
                                 .style("top", (d3.event.pageY - 28) + "px");
