@@ -82,6 +82,8 @@ export default {
       searchTerm: '',
       data: [50, 90, 20, 100, 40, 50],
       docData: null,
+      openCount: null,
+      averagOpenTime: null,
       line: ''
     }
   },
@@ -98,7 +100,7 @@ export default {
         console.log($this.docData)
         var output = foPp.countData(this.docData, 'user.email')
         console.log(output);
-        $this.renderOpenCountData(output);
+        $this.renderBarGraph(output, "Number of Opens per User");
 
         // NOTE: This is where I would call it calculate the data and create the graphic
         //       However, it currently uses static test data so it isn't necessary
@@ -106,7 +108,7 @@ export default {
         console.error(response)
       })
     },
-    renderOpenCountData(data){
+    renderBarGraph(data, yAxisLabel){
       //counts the entries by email
 
       //Now render data
@@ -216,7 +218,6 @@ export default {
             .attr("y", function (d) {
                 return yScale(d.value);
             })
-            .attr("font-family", "sans-serif")
             .attr("font-size", "11px")
             .attr("fill", "White")
             .attr("dx", "1.8em")
@@ -267,7 +268,7 @@ export default {
             //Moves text vertically.
             .attr("dy", "-2.25em")
             //Moves text horizontaly.
-            .text("Number of Opens per User");
+            .text(yAxisLabel);
 
         
 
@@ -276,7 +277,25 @@ export default {
     },
     renderAverageOpenTime(){
         let $this = this;
+        if($this.averagOpenTime == null){
+            $this.averagOpenTime = $this.getAverageOpenTime($this.docData);
+        }
+        $this.renderBarGraph($this.averagOpenTime, "Average Length of Session");
         console.log("Render Open times");
+    },
+    getAverageOpenTime(data){
+        var averageOpenTimes = d3.nest()
+                                .key(function(d){return d.user.email;})
+                                .rollup(function(v){
+                                    return d3.mean(v, function(d){
+                                        return d.session.length;
+                                    });
+                                })
+                                .entries(data);
+        console.log("Average Open times");
+        console.log(averageOpenTimes);
+        return averageOpenTimes;
+            
     },
     renderOpenCount(){
         let $this = this;
