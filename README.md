@@ -7,9 +7,31 @@ Mavericks
 
 
 
+## Team Members
+|                    |                   |                        |
+|--------------------|-------------------|------------------------|
+|Casey Hillers       | Product Owner     | chillers@fileopen.com  |
+|Nicholas Kalscheuer | Scrum Master - S3 | nkalsche@ucsc.edu      |
+|Randall Li          | Scrum Master - S2 | rhli@ucsc.edu          |
+|Ciara Fitzpatrick   | Scrum Master - S1 | ccfitzpa@ucsc.edu      |
+|Sharad Shrestha     | Scrum Master - S3 | sshrest3@ucsc.edu      |
 
+## Technology
 
+### Project Management
+* Trello - Online Scrum board
+* Slack - Team communication
+* Google Meet - Online Scrum/Emergency Meetings
+* Github - Software Management
 
+### Programming Languages
+* HTML
+* CSS
+* JavaScript
+
+### Frameworks
+* D3
+* TopoJSON
 
 ## Get Started
 
