@@ -1,5 +1,6 @@
 Mavericks
 ===
+>Version 1.0.1 Affogato
 > UCSC CMPS 115 Summer 2018 project
 
 ## Overview
