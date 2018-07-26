@@ -108,9 +108,7 @@ export default {
         $this.docData = response.body
         // NOTE: Data is an array of entries, this prints the first entry
         console.log($this.docData)
-        var output = foPp.countData(this.docData, 'user.email')
-        console.log(output);
-        var output = d3.entries(output);
+        var output = $this.getOpenCount();
         
         $this.renderBarGraph(output, "Number of Opens per User");
 
@@ -253,11 +251,10 @@ export default {
             $this.averagOpenTime = $this.getAverageOpenTime($this.docData);
         }
         if($this.graphSvg != null){
-            $this.graphSvg.remove();
-            d3.select("#barchart-container").select("svg").remove();
+            $this.clearGraph();
         }
         $this.initializeGraph();
-        $this.renderBarGraph($this.averagOpenTime, "Average Length of Session");
+        $this.renderBarGraph($this.averagOpenTime, "Average Length of Session (Seconds)");
         console.log("Render Open times");
     },
     getAverageOpenTime(data){
@@ -277,6 +274,26 @@ export default {
     renderOpenCount(){
         let $this = this;
         console.log("Render open count bar");
+        if($this.openCount == null){
+            $this.openCount = $this.getOpenCount();
+        }
+        if($this.graphSvg != null){
+            $this.clearGraph();
+        }
+        $this.initializeGraph();
+        $this.renderBarGraph($this.openCount, "Number of Opens per User");
+    },
+    getOpenCount(){
+        let $this = this;
+        var output = foPp.countData($this.docData, 'user.email')
+        console.log(output);
+        var output = d3.entries(output);
+        return output;
+    },
+    clearGraph(){
+        let $this = this;
+        $this.graphSvg.remove();
+        d3.select("#barchart-container").select("svg").remove();
     },
     initializeGraph(){
         let $this = this;
