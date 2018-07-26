@@ -97,6 +97,7 @@ export default {
     }
   },
   mounted: function () {
+    this.testGetOpenCount();
     this.initializeGraph();
     this.getData()
   },
@@ -108,7 +109,7 @@ export default {
         $this.docData = response.body
         // NOTE: Data is an array of entries, this prints the first entry
         console.log($this.docData)
-        var output = $this.getOpenCount();
+        var output = $this.getOpenCount($this.docData);
         
         $this.renderBarGraph(output, "Number of Opens per User");
 
@@ -275,7 +276,7 @@ export default {
         let $this = this;
         console.log("Render open count bar");
         if($this.openCount == null){
-            $this.openCount = $this.getOpenCount();
+            $this.openCount = $this.getOpenCount($this.docData);
         }
         if($this.graphSvg != null){
             $this.clearGraph();
@@ -283,9 +284,9 @@ export default {
         $this.initializeGraph();
         $this.renderBarGraph($this.openCount, "Number of Opens per User");
     },
-    getOpenCount(){
+    getOpenCount(data){
         let $this = this;
-        var output = foPp.countData($this.docData, 'user.email')
+        var output = foPp.countData(data, 'user.email')
         console.log(output);
         var output = d3.entries(output);
         return output;
@@ -349,6 +350,25 @@ export default {
             //Groups svg element together.
             .attr("transform", "translate(" + $this.graphMargin.left + "," + $this.graphMargin.top + ")");
         return svg;
+    },
+    testGetOpenCount(){
+        var data = JSON.parse("[{\"session\":{\"id\":\"09LYjGtZJkJmwRg2wrupkDRzrCHD01B3\",\"viewer\":\"html\",\"opened\":{\"date\":\"2018-07-03 18:31:41.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"length\":10},\"location\":{\"lat\":36.958992,\"lon\":-122.045301},\"device\":{\"created\":{\"date\":\"2018-05-19 00:00:51.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"activated\":{\"date\":\"2018-05-19 00:01:01.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"ip\":\"216.173.137.52\",\"userAgent\":{\"major\":\"60\",\"minor\":\"0\",\"patch\":null,\"family\":\"Firefox\"}},\"user\":{\"email\":\"chillers@fileopen.com\",\"first\":\"Casey\",\"last\":\"Hillers\",\"devices\":4},\"file\":{\"name\":\"FileOpen Chillers Test Document\",\"rawSize\":\"1886655\",\"uploaded\":{\"date\":\"2018-07-02 22:28:05.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"available\":true},\"link\":{\"name\":\"FileOpen Chillers Test Document to Casey Hillers\",\"watermarked\":true,\"printable\":false,\"expiration\":{\"date\":\"2018-07-10 00:00:00.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"created\":{\"date\":\"2018-07-02 22:28:57.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"}}},{\"session\":{\"id\":\"ayBEWi4IDLMTwkrueHEILdoMvIFQXZY9\",\"viewer\":\"html\",\"opened\":{\"date\":\"2018-07-03 18:51:53.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"length\":51},\"location\":{\"lat\":36.958992,\"lon\":-122.045301},\"device\":{\"created\":{\"date\":\"2018-05-19 00:00:51.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"activated\":{\"date\":\"2018-05-19 00:01:01.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"ip\":\"216.173.137.52\",\"userAgent\":{\"major\":\"60\",\"minor\":\"0\",\"patch\":null,\"family\":\"Firefox\"}},\"user\":{\"email\":\"chillers@fileopen.com\",\"first\":\"Casey\",\"last\":\"Hillers\",\"devices\":4},\"file\":{\"name\":\"FileOpen Chillers Test Document\",\"rawSize\":\"1886655\",\"uploaded\":{\"date\":\"2018-07-02 22:28:05.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"available\":true},\"link\":{\"name\":\"FileOpen Chillers Test Document to Casey Hillers\",\"watermarked\":true,\"printable\":false,\"expiration\":{\"date\":\"2018-07-10 00:00:00.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"created\":{\"date\":\"2018-07-02 22:28:57.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"}}},{\"session\":{\"id\":\"zvIDL0fMMfAgRDpb777QhpExtQBLeFYG\",\"viewer\":\"html\",\"opened\":{\"date\":\"2018-07-03 18:55:01.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"length\":0},\"location\":{\"lat\":36.958992,\"lon\":-122.045301},\"device\":{\"created\":{\"date\":\"2018-06-28 20:23:01.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"activated\":{\"date\":\"2018-06-28 20:23:16.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"ip\":\"216.173.137.52\",\"userAgent\":{\"major\":\"67\",\"minor\":\"0\",\"patch\":\"3396\",\"family\":\"Chrome Mobile\"}},\"user\":{\"email\":\"caseyhillers@gmail.com\",\"first\":\"Casey\",\"last\":\"Hillers\",\"devices\":2},\"file\":{\"name\":\"FileOpen Chillers Test Document\",\"rawSize\":\"1886655\",\"uploaded\":{\"date\":\"2018-07-02 22:28:05.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"available\":true},\"link\":{\"name\":\"FileOpen Chillers Test Document to Casey Hillers\",\"watermarked\":true,\"printable\":false,\"expiration\":{\"date\":\"2018-07-10 00:00:00.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"created\":{\"date\":\"2018-07-02 22:28:57.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"}}},{\"session\":{\"id\":\"Dk0mJufK8fqZHMKzPzeaiVU0efQzrNOr\",\"viewer\":\"html\",\"opened\":{\"date\":\"2018-07-03 18:55:10.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"length\":0},\"location\":{\"lat\":36.958992,\"lon\":-122.045301},\"device\":{\"created\":{\"date\":\"2018-06-28 20:23:01.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"activated\":{\"date\":\"2018-06-28 20:23:16.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"ip\":\"216.173.137.52\",\"userAgent\":{\"major\":\"67\",\"minor\":\"0\",\"patch\":\"3396\",\"family\":\"Chrome Mobile\"}},\"user\":{\"email\":\"caseyhillers@gmail.com\",\"first\":\"Casey\",\"last\":\"Hillers\",\"devices\":2},\"file\":{\"name\":\"FileOpen Chillers Test Document\",\"rawSize\":\"1886655\",\"uploaded\":{\"date\":\"2018-07-02 22:28:05.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"available\":true},\"link\":{\"name\":\"FileOpen Chillers Test Document to Casey Hillers\",\"watermarked\":true,\"printable\":false,\"expiration\":{\"date\":\"2018-07-10 00:00:00.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"created\":{\"date\":\"2018-07-02 22:28:57.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"}}},{\"session\":{\"id\":\"IsX17LJ29b0q0zQB50Z9vLoRSIIgiQlL\",\"viewer\":\"html\",\"opened\":{\"date\":\"2018-07-03 18:55:19.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"length\":22},\"location\":{\"lat\":36.9590243,\"lon\":-122.0453184},\"device\":{\"created\":{\"date\":\"2018-06-28 20:23:01.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"activated\":{\"date\":\"2018-06-28 20:23:16.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"ip\":\"216.173.137.52\",\"userAgent\":{\"major\":\"67\",\"minor\":\"0\",\"patch\":\"3396\",\"family\":\"Chrome Mobile\"}},\"user\":{\"email\":\"caseyhillers@gmail.com\",\"first\":\"Casey\",\"last\":\"Hillers\",\"devices\":2},\"file\":{\"name\":\"FileOpen Chillers Test Document\",\"rawSize\":\"1886655\",\"uploaded\":{\"date\":\"2018-07-02 22:28:05.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"available\":true},\"link\":{\"name\":\"FileOpen Chillers Test Document to Casey Hillers\",\"watermarked\":true,\"printable\":false,\"expiration\":{\"date\":\"2018-07-10 00:00:00.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"created\":{\"date\":\"2018-07-02 22:28:57.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"}}},{\"session\":{\"id\":\"EeDQDKmbDureOACN02qN349JbQe59l0e\",\"viewer\":\"html\",\"opened\":{\"date\":\"2018-07-03 18:59:47.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"length\":50},\"location\":{\"lat\":36.958992,\"lon\":-122.045301},\"device\":{\"created\":{\"date\":\"2018-05-19 00:00:51.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"activated\":{\"date\":\"2018-05-19 00:01:01.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"ip\":\"216.173.137.52\",\"userAgent\":{\"major\":\"60\",\"minor\":\"0\",\"patch\":null,\"family\":\"Firefox\"}},\"user\":{\"email\":\"chillers@fileopen.com\",\"first\":\"Casey\",\"last\":\"Hillers\",\"devices\":4},\"file\":{\"name\":\"FileOpen Chillers Test Document\",\"rawSize\":\"1886655\",\"uploaded\":{\"date\":\"2018-07-02 22:28:05.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"available\":true},\"link\":{\"name\":\"FileOpen Chillers Test Document to Casey Hillers\",\"watermarked\":true,\"printable\":false,\"expiration\":{\"date\":\"2018-07-10 00:00:00.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"created\":{\"date\":\"2018-07-02 22:28:57.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"}}},{\"session\":{\"id\":\"6X4T2oXM4TVUBFXfW15O5ZnLCo4EVogr\",\"viewer\":\"html\",\"opened\":{\"date\":\"2018-07-03 19:44:44.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"length\":30},\"location\":{\"lat\":36.958992,\"lon\":-122.045301},\"device\":{\"created\":{\"date\":\"2018-05-19 00:00:51.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"activated\":{\"date\":\"2018-05-19 00:01:01.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"ip\":\"216.173.137.52\",\"userAgent\":{\"major\":\"60\",\"minor\":\"0\",\"patch\":null,\"family\":\"Firefox\"}},\"user\":{\"email\":\"chillers@fileopen.com\",\"first\":\"Casey\",\"last\":\"Hillers\",\"devices\":4},\"file\":{\"name\":\"FileOpen Chillers Test Document\",\"rawSize\":\"1886655\",\"uploaded\":{\"date\":\"2018-07-02 22:28:05.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"available\":true},\"link\":{\"name\":\"FileOpen Chillers Test Document to Casey Hillers\",\"watermarked\":true,\"printable\":false,\"expiration\":{\"date\":\"2018-07-10 00:00:00.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"},\"created\":{\"date\":\"2018-07-02 22:28:57.000000\",\"timezone_type\":3,\"timezone\":\"UTC\"}}}]\r\n");
+        console.log("Raw test data");
+        console.log(data);
+        var countedData = this.getOpenCount(data);
+        console.log("Test counted data:");
+        console.log(countedData);
+        if(countedData[0].value == 4 &&
+            countedData[0].key == "chillers@fileopen.com" &&
+            countedData[1].value == 3 &&
+            countedData[1].key == "caseyhillers@gmail.com"
+        ){
+            console.log("Open count test passed");
+        }else{
+            console.log("Open count test failed");
+        }
+
+
     }
   }
 }
