@@ -255,6 +255,16 @@ export default {
             .style("opacity", 0);
             
             
+        let min = d[0].value, max = d[0].value;
+            for (let i = 1, len=d.length; i < len; i++) {
+                let v = d[i].value;
+                min = (v < min) ? v : min;
+                max = (v > max) ? v : max;
+            }
+        
+            console.log(min);
+            console.log(max);
+        
         g.append("rect")
             .attr("x", width - 750)
             .attr("y", height - 415)
@@ -267,8 +277,8 @@ export default {
             .attr("r", 3)
             .attr("cx", width - 660)
             .attr("cy", height - 275)
-            .style("fill", "blue")
-            .on("mouseover", (d) => {
+            .style("fill", "red")
+            .on("mouseover", function (d) {
                 tooltip.transition()
                     .duration(200)
                     .style("opacity", 0.9);
@@ -280,7 +290,7 @@ export default {
                         .style("left", (d3.event.pageX + 5) + "px")
                         .style("top", (d3.event.pageY - 28) + "px");
             })
-            .on("mouseout", (d) => {
+            .on("mouseout", function (d) {
                 tooltip.transition()
                     .duration(500)
                     .style("opacity", 0);
@@ -288,64 +298,76 @@ export default {
             
 
         g.append("circle")
-            .attr("r", 3)
+            .attr("r", function(d) { return Math.round(max/6); })
             .attr("cx", width - 660)
             .attr("cy", height - 300)
-            .style("fill", "blue");
+            .attr("stroke-width", 2)
+            .attr("stroke", "black")
+            .style("fill", "blue")
+            .style('opacity', 0.5);
 
         g.append("circle")
-            .attr("r", 5)
+            .attr("r", function(d) { return Math.round(max/4); })
             .attr("cx", width - 660)
             .attr("cy", height - 330)
-            .style("fill", "blue");
+            .attr("stroke-width", 2)
+            .attr("stroke", "black")
+            .style("fill", "blue")
+            .style('opacity', 0.5);
 
         g.append("circle")
-            .attr("r", 7)
+            .attr("r", function(d) { return Math.round(max/2); })
             .attr("cx", width - 660)
             .attr("cy", height - 360)
-            .style("fill", "blue");
+            .attr("stroke-width", 2)
+            .attr("stroke", "black")
+            .style("fill", "blue")
+            .style('opacity', 0.5);
         
         g.append("circle")
-            .attr("r", 9)
+            .attr("r", function(d) { return Math.round(max); })
             .attr("cx", width - 660)
             .attr("cy", height - 390)
-            .style("fill", "blue");
+            .attr("stroke-width", 2)
+            .attr("stroke", "black")
+            .style("fill", "blue")
+            .style('opacity', 0.5);
             
         g.append("text")
             .attr("class", "label")
             .attr("x", width - 700)
             .attr("y", height - 270)
             .style("text-anchor", "end")
+            .style("text-decoration", "underline")
             .text("Hint:");
 
         g.append("text")
             .attr("class", "label")
             .attr("x", width - 700)
-            .attr("y", height - 300)
+            .attr("y", height - 295)
             .style("text-anchor", "end")
-            .text("Three");
-
-        g.append("text")
-            .attr("class", "label")
-            .attr("x", width - 708)
-            .attr("y", height - 330)
-            .style("text-anchor", "end")
-            .text("Five");
+            .text(Math.round(max/6));
 
         g.append("text")
             .attr("class", "label")
             .attr("x", width - 700)
-            .attr("y", height - 360)
+            .attr("y", height - 325)
             .style("text-anchor", "end")
-            .text("Seven");
+            .text(Math.round(max/4));
+
+        g.append("text")
+            .attr("class", "label")
+            .attr("x", width - 700)
+            .attr("y", height - 355)
+            .style("text-anchor", "end")
+            .text(Math.round(max/2));
         
         g.append("text")
             .attr("class", "label")
-            .attr("x", width - 708)
+            .attr("x", width - 700)
             .attr("y", height - 390)
             .style("text-anchor", "end")
-            .text("Nine");
-  
+            .text(Math.round(max));
 
         // append the circles to svg then style
         // add functions for interaction
