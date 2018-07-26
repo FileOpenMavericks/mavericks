@@ -6,6 +6,23 @@
                 <v-text-field prepend-icon="search" v-model="searchTerm" hide-details single-line></v-text-field>
             </v-toolbar>
             <v-card-text>
+                <b-navbar>
+                    <b-navbar-nav class="barTabs">
+                        <b-nav-item class="barTab"  router  v-for="barChart in barCharts" :key="barChart.title" v-on:click="barChart.render" exact>{{barChart.title}}</b-nav-item>
+                        <!-- <v-list class="barTabs">
+                    <v-list-tile router v-for="barChart in barCharts" :key="barChart.title"  exact>
+                        <v-list-tile-action>
+                            <v-icon>{{ barChart.icon }}</v-icon>
+                        </v-list-tile-action>
+                        <v-list-tile-content>
+                            <v-list-tile-title>{{ barChart.title }}</v-list-tile-title>
+                        </v-list-tile-content>
+                    </v-list-tile>
+                </v-list> -->
+                    </b-navbar-nav>
+                </b-navbar>
+                <!-- <button v-on:click="greet">Number of Opens</button>
+                <button v-on:click="greet">Average Open Time</button> -->
                 <div id="barchart-container" class="svg-container"></div>
             </v-card-text>
         </v-card>
@@ -40,6 +57,13 @@
         font-weight: bold;
         color: white;
     }
+    .barTab{
+        padding-right: 10px;
+        cursor: pointer;
+    }
+    .barTab:active{
+        color: green;
+    }
 </style>
 
 <script>
@@ -51,9 +75,13 @@ export default {
   data () {
     return {
       docId: this.$route.params.id,
+      barCharts: [
+          {title: 'Number of Opens', render: this.renderOpenCount},
+          {title: 'Average Open Time', render: this.renderAverageOpenTime}
+      ],
       searchTerm: '',
       data: [50, 90, 20, 100, 40, 50],
-      linkData: null,
+      docData: null,
       line: ''
     }
   },
@@ -65,10 +93,10 @@ export default {
     getData () {
       let $this = this
       $this.$http.get('https://pubtest.fileopen.com/api/analytics/file/' + $this.docId).then(response => {
-        $this.linkData = response.body
+        $this.docData = response.body
         // NOTE: Data is an array of entries, this prints the first entry
-        console.log($this.linkData)
-        var output = foPp.countData(this.linkData, 'user.email')
+        console.log($this.docData)
+        var output = foPp.countData(this.docData, 'user.email')
         console.log(output);
         $this.renderOpenCountData(output);
 
@@ -120,7 +148,6 @@ export default {
 
         var yAxis = d3.axisLeft(yScale)
             .ticks(5)
-            //It gets dollar_sign value from dollar_sign variable and displays it.
 
         // Define SVG. "g" means group SVG elements together.
         console.log("Got to through scaling");
@@ -246,6 +273,14 @@ export default {
 
         
 
+    },
+    renderAverageOpenTime(){
+        let $this = this;
+        console.log("Render Open times");
+    },
+    renderOpenCount(){
+        let $this = this;
+        console.log("Render open count bar");
     }
   }
 }
