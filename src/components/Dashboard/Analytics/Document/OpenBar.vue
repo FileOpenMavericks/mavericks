@@ -188,11 +188,11 @@ export default {
             .attr("y", function (d) {
                 return $this.yScale(d.value);
             })
-            .attr("font-size", "11px")
+            .attr("font-size", "20px")
             .attr("fill", "White")
-            .attr("dx", "1.8em")
+            .attr("dx", "1.2em")
             //Moves text horizontaly.
-            .attr("dy", ".85em")
+            .attr("dy", "1.2em")
             //Moves text verticaly.
             .style("text-anchor", "middle");
 
