@@ -42,8 +42,10 @@ export default {
     return {
       items: [
         // { title: 'Link Open Location', route: 'demo', icon: 'room' },
-        { title: 'Link Open Times', route: '/document/' + this.$route.params.id + '/openbar', icon: 'history' },
-        {title: 'Link Open Locations', route: '/document/' + this.$route.params.id + '/opengoogle'}
+        { title: 'File Open Times', route: '/document/' + this.$route.params.id + '/openbar', icon: 'history' },
+        {title: 'File Open Locations', route: '/document/' + this.$route.params.id + '/opengoogle'},
+        {title: 'File Open Dates', route: '/document/' + this.$route.params.id + '/openchart'},
+        {title: 'File Opens By Company', route: '/document/' + this.$route.params.id + '/openbubble'}
       ],
       id: this.$route.params.id,
       right: null
