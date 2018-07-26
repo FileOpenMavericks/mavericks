@@ -114,15 +114,12 @@ export default {
 
         // Define X and Y AXIS
 
-        var  dollar_sign = d3.format("$");
             //Variable is created known as the dollar_sign with value $
 
         var xAxis = d3.axisBottom(xScale);
 
         var yAxis = d3.axisLeft(yScale)
             .ticks(5)
-            //Creats interval of 5 in y axis.
-            .tickFormat(dollar_sign);
             //It gets dollar_sign value from dollar_sign variable and displays it.
 
         // Define SVG. "g" means group SVG elements together.
