@@ -44,7 +44,7 @@ export default {
         return {
             searchTerm: '',
             data: [50, 90, 20, 100, 40, 50],
-            linkData: null,
+            docData: null,
             line: ''
         }
     },
@@ -55,12 +55,13 @@ export default {
     methods: {
       getData() {
           let $this = this;
-          let linkId = '426732708eee4929bd0ecbe9a4fc0b18'
-          $this.$http.get('https://pubtest.fileopen.com/api/analytics/link/' + linkId).then(response => {
-              $this.linkData = response.body;
+        //  let linkId = '426732708eee4929bd0ecbe9a4fc0b18'
+          let docRefId = '52f2468e05f743ca9911abe07c196363'
+          $this.$http.get('https://pubtest.fileopen.com/api/analytics/file/' + docRefId).then(response => {
+              $this.docData = response.body;
               // NOTE: Data is an array of entries, this prints the first entry
-              console.log($this.linkData);
-              var output = foPp.countData(this.linkData, "user.email");
+              console.log($this.docData);
+              var output = foPp.countData(this.docData, "user.email");
               console.log(output);
 
               // NOTE: This is where I would call it calculate the data and create the graphic
@@ -78,7 +79,7 @@ export default {
                                             return {
                                               count: v.length
                                             }})
-                                         .entries($this.linkData);
+                                         .entries($this.docData);
                       countedMonthDay.forEach(function(d){
                         let dateObj = dateParse(d.key);
                         d.month = dateObj.getMonth();
