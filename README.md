@@ -8,6 +8,7 @@ Mavericks
 
 
 ## Team Members
+|                    |                   |                        |
 |--------------------|-------------------|------------------------|
 |Nicholas Kalscheuer | Scrum Master - S3 | nkalsche@ucsc.edu      |
 |Randall Li          | Scrum Master - S2 | rhli@ucsc.edu          |
