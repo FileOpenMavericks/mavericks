@@ -90,7 +90,9 @@ export default {
       graphHeight: 0,
       graphSvg: null,
       xScale: null,
-      yScale: null
+      yScale: null,
+      xAxis: null,
+      yAxis: null
     }
   },
   mounted: function () {
@@ -128,14 +130,7 @@ export default {
 
 
 
-        // Define X and Y AXIS
-
-            //Variable is created known as the dollar_sign with value $
-
-        var xAxis = d3.axisBottom($this.xScale);
-
-        var yAxis = d3.axisLeft($this.yScale)
-            .ticks(5)
+        
 
         // Define SVG. "g" means group SVG elements together.
         console.log("Got to through scaling");
@@ -215,7 +210,7 @@ export default {
         svg.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(0," + ($this.graphHeight + 0.1) + ")")
-            .call(xAxis)
+            .call($this.xAxis)
             .selectAll("text")
             //Selects all text in x axis.
             .attr("dx", ".1em")
@@ -233,7 +228,7 @@ export default {
         svg.append("g")
             .attr("class", "y axis")
             .attr("transform", "translate(0," + ($this.graphWidth - 690) + ")")
-            .call(yAxis)
+            .call($this.yAxis)
             .selectAll("text")
             //Selects all text element.
             .attr("dx", ".1em")
@@ -314,6 +309,15 @@ export default {
             //(.range) specifies the range that those values will cover.
             //The range is specified as being from the height of the graphing area to 0. 
             //It make starting point from the height of the graphing area to 0.
+        // Define X and Y AXIS
+
+            //Variable is created known as the dollar_sign with value $
+
+        $this.xAxis = d3.axisBottom($this.xScale);
+
+        $this.yAxis = d3.axisLeft($this.yScale)
+            .ticks(5)
+        
 
     }
   }
