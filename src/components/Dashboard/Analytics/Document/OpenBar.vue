@@ -92,7 +92,8 @@ export default {
       xScale: null,
       yScale: null,
       xAxis: null,
-      yAxis: null
+      yAxis: null,
+      graphSvg: null
     }
   },
   mounted: function () {
@@ -135,16 +136,7 @@ export default {
         // Define SVG. "g" means group SVG elements together.
         console.log("Got to through scaling");
         //Creates svg element to place shapes e.g rectangles.(makes svg container)
-        var svg = d3.select("#barchart-container").append("svg")
-            //Creates svg variable.
-            //It will find the body and append a new svg element just before the closing the body.
-            .attr("width", $this.graphWidth + $this.graphMargin.left + $this.graphMargin.right)
-            //Width is refrenced from earlier code located at var margin.
-            .attr("height", $this.graphHeight + $this.graphMargin.top + $this.graphMargin.bottom)
-            //Height is refrenced from earlier code located at var margin.
-            .append("g")
-            //Groups svg element together.
-            .attr("transform", "translate(" + $this.graphMargin.left + "," + $this.graphMargin.top + ")");
+        
             //This attribute applies a list of transformations to an element and sub-elments.
             //Tells the SVG Group Element, "g", to do a transformation where by it translates the element and sub-elements by 
             //moving to $this.graphMargin.left value from earlier code, margin.top value from earlier code.(topleft)
@@ -168,7 +160,7 @@ export default {
         // you can create circle or anytype of shape you want here.
 
         //selection of rectangles and creates rectangles
-        svg.selectAll("rect")
+        $this.graphSvg.selectAll("rect")
             .data(data)
             //Allows us to attach data of any type
             .enter()
@@ -185,7 +177,7 @@ export default {
             .attr("y", function (d){ return $this.yScale(d.value)})
             .attr("fill", function (d, i) { return "rgb(255, 105, " + (i * 20) + ")";});
 
-        svg.selectAll("text")
+        $this.graphSvg.selectAll("text")
             .data(data)
             .enter()
             .append("text")
@@ -207,7 +199,7 @@ export default {
             .style("text-anchor", "middle");
 
         // Draw xAxis and position the label at -60 degrees as shown on the output
-        svg.append("g")
+        $this.graphSvg.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(0," + ($this.graphHeight + 0.1) + ")")
             .call($this.xAxis)
@@ -225,7 +217,7 @@ export default {
             });
 
         // Draw yAxis and postion the label
-        svg.append("g")
+        $this.graphSvg.append("g")
             .attr("class", "y axis")
             .attr("transform", "translate(0," + ($this.graphWidth - 690) + ")")
             .call($this.yAxis)
@@ -239,7 +231,7 @@ export default {
             .attr("font-size", "10px");
 
         //Displays the text
-        svg.append("text")
+        $this.graphSvg.append("text")
             .attr("text-anchor", "middle")
             //This makes it easy to centre the text as the transform is applied to the anchor.
             .attr("transform", "translate(0," + ($this.graphWidth - 450) + ")rotate(-90)")
@@ -260,6 +252,11 @@ export default {
         if($this.averagOpenTime == null){
             $this.averagOpenTime = $this.getAverageOpenTime($this.docData);
         }
+        if($this.graphSvg != null){
+            $this.graphSvg.remove();
+            d3.select("#barchart-container").select("svg").remove();
+        }
+        $this.initializeGraph();
         $this.renderBarGraph($this.averagOpenTime, "Average Length of Session");
         console.log("Render Open times");
     },
@@ -316,9 +313,25 @@ export default {
         $this.xAxis = d3.axisBottom($this.xScale);
 
         $this.yAxis = d3.axisLeft($this.yScale)
-            .ticks(5)
+            .ticks(5);
+        
+        $this.graphSvg = $this.initializeSvg();
         
 
+    },
+    initializeSvg(){
+        let $this = this;
+        var svg = d3.select("#barchart-container").append("svg")
+            //Creates svg variable.
+            //It will find the body and append a new svg element just before the closing the body.
+            .attr("width", $this.graphWidth + $this.graphMargin.left + $this.graphMargin.right)
+            //Width is refrenced from earlier code located at var margin.
+            .attr("height", $this.graphHeight + $this.graphMargin.top + $this.graphMargin.bottom)
+            //Height is refrenced from earlier code located at var margin.
+            .append("g")
+            //Groups svg element together.
+            .attr("transform", "translate(" + $this.graphMargin.left + "," + $this.graphMargin.top + ")");
+        return svg;
     }
   }
 }
