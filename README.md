@@ -63,10 +63,10 @@ Analytics directory:
 * DashboardDemo.vue (The static default page there is nothing loaded on the page.)
 
 Document directory:
-* OpenBar.vue
-* OpenBubble.vue
-* OpenChart.vue
-* OpenGoogle.vue
+* OpenBar.vue (This page show a bar chart of average session time of a document by user and the number of times it was opened.)
+* OpenBubble.vue (This page shows a bubble chart of number of times a document was opened per user and categorizes it by email domain.)
+* OpenChart.vue (This page shows the number of times a document was opened per user by month and day, similar to Github's contribution heat chart.)
+* OpenGoogle.vue (This page shows the locations of where users opened the document.)
 
 
 
