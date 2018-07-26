@@ -49,7 +49,6 @@ export default {
         }
     },
     mounted: function(){
-      console.log("mounted");
       this.getData();
     },
     created: function() {},
@@ -66,6 +65,28 @@ export default {
               $this.renderData($this.linkData);
               // NOTE: This is where I would call it calculate the data and create the graphic
               //       However, it currently uses static test data so it isn't necessary
+
+              var dateFormat = d3.timeFormat("%x");
+                      var dateParse = d3.timeParse(dateFormat);
+
+                      var countedMonthDay = d3.nest()
+                                            .key(function(d){
+                                              d.session.opened.date = new Date(d.session.opened.date);
+                                              d.session.opened.date  = dateFormat(d.session.opened.date);
+                                              return d.session.opened.date; })
+                                            .rollup(function(v){
+                                              return {
+                                              count: v.length
+                                            }})
+                                            .entries($this.linkData);
+                      countedMonthDay.forEach(function(d){
+                        let dateObj = dateParse(d.key);
+                        d.month = dateObj.getMonth();
+                        d.day = dateObj.getDay();
+                      });
+
+                      console.log("counted month, day");
+                      console.log(countedMonthDay);
           }, response => {
               console.error(response);
           });
@@ -953,7 +974,6 @@ export default {
           		"value": 4
           	}
           ];
-
 
             // currently, we are using the above sample data set to test the features in the heat chart
             // with the forEach() function
