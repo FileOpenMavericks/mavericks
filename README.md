@@ -81,4 +81,6 @@ Document directory:
 
 [Vuetify](https://vuetifyjs.com/releases/0.17/#/vuetify/quick-start) - VueJS library that allows to easily make pretty components (any component prefaced with `v-` comes from it)
 
+Sharad's bubble chart demo: https://sharad97.github.io/CMPS-115/project_testing/bublechart_legend2.html
+
 * NOTE: The project doesn't use the latest Vuetify
